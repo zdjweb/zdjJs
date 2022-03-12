@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>MScrollbar</title>
+</head>
+<body>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            font-size: 0;
+        }
+        main{
+            width: 150vw;
+            height: 150vh;
+            background: #FFFFFF;
+            font-size: 12vw;
+        }
+        #MScrollbar1{
+            position: fixed;
+            top: 0;
+            left: 98.5vw;
+            width: 1.5vw;
+            height: calc(100vh - 1.5vw);
+        }
+        #MScrollbar2{
+            position: fixed;
+            top: calc(100vh - 1.5vw);
+            left: 0;
+            width: 98.5vw;
+            height: 1.5vw;
+        }
+    </style>
+    
+    <main>其实我是来撑开页面的</main>
+    <script src="../zdj.js"></script>
+    <div id="MScrollbar1"></div>
+    <div id="MScrollbar2"></div>
+    <script src="MScrollbar.js"></script>
+    <script>
+        let ms1 = new MScrollbar({
+            controlled: window,
+            container: document.querySelector('#MScrollbar1'),
+            direction: 0,
+            track: {
+                background: '#C8C8FA'
+            },
+            thumb: {
+                width: 70,
+                background: '#FFFFFF',
+                rounded: 80
+            }
+        });
+        let ms2 = new MScrollbar({
+            controlled: window,
+            container: document.querySelector('#MScrollbar2'),
+            direction: 1,
+            track: {
+                background: '#C8C8FA'
+            },
+            thumb: {
+                width: 70,
+                background: '#FFFFFF',
+                rounded: 80
+            }
+        });
+    </script>
+</body>
+</html>

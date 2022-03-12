@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>TSelect</title>
+</head>
+<style>
+    body{
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        font-size: 0;
+    }
+</style>
+<body>
+    <script src="../zdj.js"></script>
+    <script src="TSelect.js"></script>
+    <script>
+        let ts = new TSelect({
+            container: document.body,
+            values: [0,1,2,3],
+            number: 5,
+            background: '#FFFFFF',
+            font: {
+                size: 1,
+                color: '#807F7F'
+            },
+            line: {
+                height: 1,
+                background: '#EEEEEE'
+            }
+        })
+    </script>
+</body>
+</html>

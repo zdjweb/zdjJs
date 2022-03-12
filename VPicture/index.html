@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>VPicture</title>
+</head>
+<style>
+    body{
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        font-size: 0;
+    }
+</style>
+<body>
+    <script src="../zdj.js"></script>
+    <script src="VPicture.js"></script>
+    <script>
+        let vp = new VPicture({
+            container: document.body,
+            src: '1.png',
+            background: '#C8C8FA'
+        });
+        //功能演示代码
+        setTimeout(() => {
+            vp.changeSrc('2.png');
+            setTimeout(() => {
+                vp.changeTimes(0.5);
+                setTimeout(() => {
+                    vp.changeBackground('#99CCFF');
+                    setTimeout(() => {
+                        vp.setClickFunction(() => {
+                            vp.changeSrc(Math.round(Math.random()) + 1 + '.png');
+                            let arr = ['#99CCFF','#f6b05e','#C8C8FA'];
+                            arr.splice(arr.indexOf(vp.background),1);
+                            vp.changeBackground(arr[Math.round(Math.random())]);
+                        });
+                    },1000);
+                },1000);
+            },1000);
+        },1000);
+    </script>
+</body>
+</html>

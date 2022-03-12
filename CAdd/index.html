@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>CAdd</title>
+</head>
+<body>
+    <script src="../zdj.js"></script>
+    <script>
+        Object.assign(document.body.style,{
+            margin: 0,
+            padding: 0,
+            fontSize: 0
+        });
+        let zwb = new zdjJs();
+        let addMsg = () => {
+            let state = 0;
+            return zwb.addElementByArray([
+                'div',
+                'innerHTML','点击后不可点击',
+                'style',[
+                    'margin-top','5vw',
+                    'margin-left','20vw',
+                    'width','60vw',
+                    'height','30vw',
+                    'border-radius','5vw',
+                    'background','#99CCFF',
+                    'color','#F5F5F5',
+                    'text-align','center',
+                    'line-height','10vw',
+                    'font-size','5vw'
+                ],
+                'function',[
+                    'click',(e) => {
+                        if(!state){
+                            e.target.innerHTML = '我被点击过了' + '<br>点击了' + ++state + '次<br>不能被点击了';
+                            e.target.style.background = '#C8C8FA';
+                        }
+                    }
+                ]
+            ]);
+        }
+        let btn = zwb.addElementByArray([
+            'div',
+            'innerHTML','+',
+            'style',[
+                'margin-top','5vw',
+                'margin-bottom','10vw',
+                'margin-left','20vw',
+                'width','60vw',
+                'height','10vw',
+                'border-radius','5vw',
+                'background','#99CCFF',
+                'color','#F5F5F5',
+                'text-align','center',
+                'line-height','10vw',
+                'font-size','5vw'
+            ],
+            'function',[
+                'click',() => {
+                    document.body.insertBefore(addMsg(),btn);
+                    document.documentElement.scrollTop = document.documentElement.scrollHeight;
+                }
+            ]
+        ],document.body);
+    </script>
+</body>
+</html>

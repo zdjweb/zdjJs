@@ -17,13 +17,13 @@ class zdjJs{
             pageN: [],
             //当前页面
             now: null,
-            //创建页面
-            create: () => {}
+            //用于创建页面的数组
+            arr: []
         };
         Object.defineProperties(this,{
             //版本信息
             version: {
-                get: () => '1.0.0'
+                get: () => '1.0.2'
             },
             //作者信息
             author: {
@@ -176,21 +176,29 @@ class zdjJs{
                     }
                 }
             },
-            //设置增加页面方法
-            setAddPage: {
+            //设置用于创建页面的数组
+            setPage: {
                 get: () => {
-                    return (uFunction) => {
-                        page.create = uFunction;
+                    return (uArr) => {
+                        page.arr = [...uArr];
                     }
                 }
             },
-            //增加页面分类
-            addPageType: {
+            //创建页面
+            createPage: {
                 get: () => {
-                    return (uType) => {
-                        page.type.push(uType.toString());
-                        page[uType] = [];
-                        page.pageN.push(0);
+                    return (...uIn) => {
+                        if(!uIn.length){
+                            return this.addElementByArray(page.arr);
+                        }else if(uIn.length == 1){
+                            return this.addElementByArray([...uIn[0]]);
+                        }else{
+                            if(uIn[0] == undefined){
+                                return this.addElementByArray(page.arr,uIn[1]);
+                            }else{
+                                return this.addElementByArray([...uIn[0]],uIn[1]);
+                            }
+                        }
                     }
                 }
             },
@@ -198,7 +206,12 @@ class zdjJs{
             addPage: {
                 get: () => {
                     return (uType,uPage) => {
-                        page[uType] == undefined?this.addPageType(uType):0;
+                        //页面分类不存在时创建分类
+                        page[uType] == undefined?(() => {
+                            page.type.push(uType.toString());
+                            page[uType] = [];
+                            page.pageN.push(0);
+                        })():0;
                         if(!page.type.indexOf(uType) && !page[uType].length){
                             page.now = uPage;
                         }
@@ -223,12 +236,6 @@ class zdjJs{
                             }
                         }
                     }
-                }
-            },
-            //获取页面信息
-            getPageMsg: {
-                get: () => {
-                    return page;
                 }
             }
         });

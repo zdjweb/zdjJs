@@ -7,6 +7,17 @@ class zdjJs{
         let fontTimes;
         //字体单位
         let fontSuffix;
+        //页面信息
+        let page = {
+            //页面类别
+            type: [],
+            //当前页面类别编号
+            typeN: 0,
+            //页面类别所在页面编号
+            pageN: [],
+            //当前页面
+            now: null
+        };
         Object.defineProperties(this,{
             //版本信息
             version: {
@@ -161,6 +172,53 @@ class zdjJs{
                         }
                         return max;
                     }
+                }
+            },
+            //增加页面分类
+            addPageType: {
+                get: () => {
+                    return (uType) => {
+                        page.type.push(uType.toString());
+                        page[uType] = [];
+                        page.pageN.push(0);
+                    }
+                }
+            },
+            //给页面分类增加页面
+            addPage: {
+                get: () => {
+                    return (uType,uPage) => {
+                        page[uType] == undefined?this.addPageType(uType):0;
+                        if(!page.type.indexOf(uType) && !page[uType].length){
+                            page.now = uPage;
+                        }
+                        page[uType].push(uPage);
+                    }
+                }
+            },
+            //切换页面
+            changePage: {
+                get: () => {
+                    return (uPage) => {
+                        for(let i in page.type){
+                            for(let j in page[page.type[i]]){
+                                if(uPage == page[page.type[i]][j]){
+                                    page.typeN = i;
+                                    page.pageN[i] = j;
+                                    page.now.style.display = 'none';
+                                    page.now = uPage;
+                                    uPage.style.display = 'block';
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            //获取页面信息
+            getPageMsg: {
+                get: () => {
+                    return page;
                 }
             }
         });

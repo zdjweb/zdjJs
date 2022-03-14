@@ -16,7 +16,9 @@ class zdjJs{
             //页面类别所在页面编号
             pageN: [],
             //当前页面
-            now: null
+            now: null,
+            //创建页面
+            addPage: () => {}
         };
         Object.defineProperties(this,{
             //版本信息
@@ -171,6 +173,14 @@ class zdjJs{
                             }
                         }
                         return max;
+                    }
+                }
+            },
+            //设置增加页面方法
+            setAddPage: {
+                get: () => {
+                    return (uFunction) => {
+                        page.addPage = uFunction;
                     }
                 }
             },

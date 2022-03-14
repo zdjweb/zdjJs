@@ -18,7 +18,7 @@ class zdjJs{
             //当前页面
             now: null,
             //创建页面
-            addPage: () => {}
+            create: () => {}
         };
         Object.defineProperties(this,{
             //版本信息
@@ -180,7 +180,7 @@ class zdjJs{
             setAddPage: {
                 get: () => {
                     return (uFunction) => {
-                        page.addPage = uFunction;
+                        page.create = uFunction;
                     }
                 }
             },

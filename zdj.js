@@ -202,6 +202,7 @@ class zdjJs{
                             page.now = newPage;
                         }
                         page[uType].push(newPage);
+                        return newPage;
                     }
                 }
             },

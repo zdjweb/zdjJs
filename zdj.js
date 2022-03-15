@@ -236,7 +236,7 @@ class zdjJs{
                 }
             },
             //通过页面类别编号切换页面类别
-            changePageType: {
+            changePageTypeN: {
                 get: () => {
                     return (uTypeN) => {
                         this.typeN = uTypeN;

@@ -18,7 +18,9 @@ class zdjJs{
             //当前页面
             now: null,
             //用于创建页面的数组
-            arr: []
+            arr: [],
+            //用于放置页面的容器
+            container: null
         };
         Object.defineProperties(this,{
             //版本信息
@@ -179,43 +181,27 @@ class zdjJs{
             //设置用于创建页面的数组
             setPage: {
                 get: () => {
-                    return (uArr) => {
+                    return (uArr,uContainer) => {
                         page.arr = [...uArr];
+                        page.container = uContainer;
                     }
                 }
             },
-            //创建页面
-            createPage: {
-                get: () => {
-                    return (...uIn) => {
-                        if(!uIn.length){
-                            return this.addElementByArray(page.arr);
-                        }else if(uIn.length == 1){
-                            return this.addElementByArray([...uIn[0]]);
-                        }else{
-                            if(uIn[0] == undefined){
-                                return this.addElementByArray(page.arr,uIn[1]);
-                            }else{
-                                return this.addElementByArray([...uIn[0]],uIn[1]);
-                            }
-                        }
-                    }
-                }
-            },
-            //给页面分类增加页面
+            //创建页面并加入页面分类
             addPage: {
                 get: () => {
-                    return (uType,uPage) => {
+                    return (uType) => {
                         //页面分类不存在时创建分类
                         page[uType] == undefined?(() => {
                             page.type.push(uType.toString());
                             page[uType] = [];
                             page.pageN.push(0);
                         })():0;
+                        let newPage = this.addElementByArray(page.arr,page.container);
                         if(!page.type.indexOf(uType) && !page[uType].length){
-                            page.now = uPage;
+                            page.now = newPage;
                         }
-                        page[uType].push(uPage);
+                        page[uType].push(newPage);
                     }
                 }
             },
@@ -235,6 +221,25 @@ class zdjJs{
                                 }
                             }
                         }
+                    }
+                }
+            },
+            //通过页面类别名切换页面类别
+            changePageType: {
+                get: () => {
+                    return (uType) => {
+                        let needTypeN = page.type.indexOf(uType);
+                        this.typeN = needTypeN;
+                        this.changePage(page[page.type[needTypeN]][page.pageN[needTypeN]]);
+                    }
+                }
+            },
+            //通过页面类别编号切换页面类别
+            changePageType: {
+                get: () => {
+                    return (uTypeN) => {
+                        this.typeN = uTypeN;
+                        this.changePage(page[page.type[uTypeN]][page.pageN[uTypeN]]);
                     }
                 }
             }

@@ -12,8 +12,13 @@
         height: 100vh;
         font-size: 0;
     }
+    #min{
+        width: 50vw;
+        height: 50vw;
+    }
 </style>
 <body>
+    <div id="min"></div>
     <script src="../zdj.js"></script>
     <script src="LMusic.js"></script>
     <script>
@@ -47,8 +52,8 @@
                 },
                 {
                     src: 'Fusq - Perfume!.mp3',
-                    author: '',
-                    name: '',
+                    author: 'Fusq',
+                    name: 'Perfume!',
                     cover: 'Fusq - Perfume!.jpg',
                     words: ''
                 }
@@ -81,7 +86,7 @@
             //最小功能
             min: {
                 //容器
-                container: document.body,
+                container: document.querySelector('#min'),
                 //背景颜色
                 background: '#C8C8FA'
             }

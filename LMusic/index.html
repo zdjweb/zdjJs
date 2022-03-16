@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>LMusic</title>
+</head>
+<style>
+    body{
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        font-size: 0;
+    }
+</style>
+<body>
+    <script src="../zdj.js"></script>
+    <script src="LMusic.js"></script>
+    <script>
+        let lm = new LMusic({
+            //地址设置
+            path: {
+                music: 'music',
+                cover: 'cover',
+                btn: 'btn'
+            },
+            //播放设置
+            play: {
+                //自动播放
+                auto: true,
+                //播放模式
+                mode: 2
+            },
+            //音乐
+            music: [
+                {
+                    //音乐地址
+                    src: 'YUE.STEVEN,uen - dB doll.mp3',
+                    //音乐作者
+                    author: 'YUE.STEVEN,uen',
+                    //音乐名
+                    name: 'dB doll',
+                    //音乐封面
+                    cover: 'YUE.STEVEN,uen - dB doll.png',
+                    //歌词地址
+                    words: ''
+                },
+                {
+                    src: 'Fusq - Perfume!.mp3',
+                    author: '',
+                    name: '',
+                    cover: 'Fusq - Perfume!.jpg',
+                    words: ''
+                }
+            ],
+            //按钮
+            btn: {
+                //上一首
+                last: 'last.png',
+                //播放
+                play: 'play.png',
+                //暂停
+                pause: 'pause.png',
+                //下一首
+                next: 'next.png',
+                //列表循环
+                loop: 'loop.png',
+                //单曲循环
+                loopOne: 'loopOne.png',
+                //随机播放
+                random: 'random.png',
+                //音量大
+                volumeHigh: 'volumeHigh.png',
+                //音量中
+                volumeMedium: 'volumeMedium.png',
+                //音量小
+                volumeLow: 'volumeLow.png',
+                //音量无
+                volume: 'volume.png'
+            },
+            //最小功能
+            min: {
+                //容器
+                container: document.body,
+                //背景颜色
+                background: '#C8C8FA'
+            }
+        });
+    </script>
+</body>
+</html>

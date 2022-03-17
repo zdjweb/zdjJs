@@ -11,14 +11,42 @@
         width: 100vw;
         height: 100vh;
         font-size: 0;
+        background: #99ccff;
     }
-    #min{
-        width: 50vw;
-        height: 50vw;
+    #min1{
+        position: fixed;
+        top: 90vh;
+        left: calc(100vw - 10vh);
+        width: 10vh;
+        height: 10vh;
+    }
+    #min2{
+        position: fixed;
+        top: 90vh;
+        left: 0;
+        width: 10vh;
+        height: 10vh;
+    }
+    #text1{
+        position: fixed;
+        top: 0;
+        left: calc(100vw - 35vh);
+        width: 35vh;
+        height: 7vh;
+    }
+    #text2{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 35vh;
+        height: 7vh;
     }
 </style>
 <body>
-    <div id="min"></div>
+    <div id="min1"></div>
+    <div id="min2"></div>
+    <div id="text1"></div>
+    <div id="text2"></div>
     <script src="../zdj.js"></script>
     <script src="LMusic.js"></script>
     <script>
@@ -84,12 +112,46 @@
                 volume: 'volume.png'
             },
             //最小功能
-            min: {
-                //容器
-                container: document.querySelector('#min'),
-                //背景颜色
-                background: '#C8C8FA'
-            }
+            min: [
+                {
+                    //容器
+                    container: document.querySelector('#min1'),
+                    //是否显示封面
+                    coverShow: true,
+                    //背景颜色
+                    background: '#F5F5F5'
+                },
+                {
+                    //容器
+                    container: document.querySelector('#min2'),
+                    //是否显示封面
+                    coverShow: false,
+                    //背景颜色
+                    background: '#F5F5F5'
+                }
+            ],
+            //文本功能
+            text: [
+                {
+                    //容器
+                    container: document.querySelector('#text1'),
+                    //是否显示封面
+                    coverShow: true,
+                    //按钮部分背景颜色
+                    btnBackground: '#FFFFFF',
+                    //文本部分背景颜色
+                    textBackground: '#F5F5F5',
+                    //文本部分字体颜色
+                    textColor: '#111111'
+                },
+                {
+                    container: document.querySelector('#text2'),
+                    coverShow: false,
+                    btnBackground: '#FFFFFF',
+                    textBackground: '#F5F5F5',
+                    textColor: '#111111'
+                }
+            ]
         });
     </script>
 </body>

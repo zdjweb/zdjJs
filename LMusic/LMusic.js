@@ -3,7 +3,7 @@ class LMusic{
         //需要加载的设置
         let need = ['path','play','music','btn'];
         //可以加载的模式
-        let mode = ['min'];
+        let mode = ['min','text'];
         //地址设置
         let path = {};
         //播放设置
@@ -14,6 +14,8 @@ class LMusic{
         let btn = {};
         //播放状态
         let state = 0;
+        //错误状态
+        let error = 0;
         //当前播放的音乐
         let now = 0;
         Object.defineProperties(this,{
@@ -55,10 +57,15 @@ class LMusic{
                 }
             }else{
                 if(mode.includes(i)){
-                    modeset.push(e[i]);
-                    modeset[modeset.length - 1].mode = i;
-                }else{
-                    console.log('属性"' + e[i] + '"无效！');
+                    if(Array.isArray(e[i])){
+                        for(let j in e[i]){
+                            modeset.push(e[i][j]);
+                            modeset[modeset.length - 1].mode = i;
+                        }
+                    }else{
+                        modeset.push(e[i]);
+                        modeset[modeset.length - 1].mode = i;
+                    }
                 }
             }
         }
@@ -93,24 +100,20 @@ class LMusic{
         //修正自动播放设置
         if(play.auto == undefined){
             play.auto = false;
-            console.log('请使用布尔值true或false作为play.auto的值，否则可能会出现不想要的结果！');
         }else{
             if(![true,false].includes(play.auto)){
                 play.auto = Boolean(play.auto);
-                console.log('请使用布尔值true或false作为play.auto的值，否则可能会出现不想要的结果！');
             }
         }
         //修正播放模式设置
         if(play.mode == undefined){
             play.mode = 0;
-            console.log('请使用数值0、1、2其中一个作为play.auto的值，否则可能会出现不想要的结果！');
         }else{
             if(![0,1,2].includes(play.mode)){
                 play.mode = parseInt(play.mode);
                 if(![0,1,2].includes(play.mode)){
                     play.mode = 0;
                 }
-                console.log('请使用数值0、1、2其中一个作为play.auto的值，否则可能会出现不想要的结果！');
             }
         }
         //初始化音频媒体
@@ -121,29 +124,82 @@ class LMusic{
         let btns = [];
         //封面
         let covers = [];
-        //增加最小功能
+        //音乐信息文本
+        let texts = [];
+        //播放状态下的设置
+        let playSet = () => {
+            state = 1;
+            for(let i in btns){
+                btns[i].src = btn.pause;
+            }
+        };
+        //暂停状态下的设置
+        let pauseSet = () => {
+            state = 0;
+            for(let i in btns){
+                btns[i].src = btn.play;
+            }
+        };
+        //切换修正功能
+        let fixChange = () => {
+            if(now < 0){
+                now = audio.length - 1;
+            }else if(now > audio.length - 1){
+                now = 0;
+            }
+        };
+        //音乐封面及信息重新加载
+        let coverAndTextReload = () => {
+            for(let i in covers){
+                if(covers[i].localName == 'img'){
+                    covers[i].src = music[now].cover;
+                }else{
+                    covers[i].style.backgroundImage = 'url("' + music[now].cover + '")';
+                }
+            }
+            for(let i in texts){
+                texts[i].innerHTML = '正在播放：' + music[now].author + ' - ' + music[now].name;
+            }
+        };
+        //切换音乐功能
+        let changeMusic = () => {
+            audio[now].pause();
+            audio[now].currentTime = 0;
+            if(!play.mode){
+                now += 1;
+            }else if(play.mode == 2){
+                let arr = [];
+                for(let i in audio){
+                    if(i != now){
+                        arr.push(i);
+                    }
+                }
+                now = arr[Math.round(Math.random() * (arr.length - 1))];
+            }
+            fixChange();
+            coverAndTextReload();
+            setAudio();
+            audio[now].play();
+        };
+        //创建iiframe容器
+        let addContainer = (container) => {
+            return z.addElementByArray([
+                'iframe',
+                'style',[
+                    'width','100%',
+                    'height','100%',
+                    'border',0
+                ]
+            ],container);
+        };
+        //增加最小功能LMusic
         let setMinLMusic = (set) => {
-            if(set.container == undefined){
-                console.log('未定义容器，min.container不能为空！');
-                return;
-            }else{
-                //获取容器
-                let container = set.container;
+            if(set.container != undefined){
+                //创建容器 获取窗口
+                let w = addContainer(set.container).contentWindow;
                 //更新容器
-                container = z.addElementByArray([
-                    'iframe',
-                    'style',[
-                        'width','100%',
-                        'height','100%',
-                        'border',0
-                    ]
-                ],container);
-                //获取窗口
-                let w = container.contentWindow;
-                //更新容器
-                container = w;
-                //增加LMusic主要部分
-                //增加最小功能的主要部分
+                let container = w;
+                //增加最小功能LMusic的主要部分
                 let setLMusic = () => {
                     //更新容器
                     container = container.document.body;
@@ -161,13 +217,13 @@ class LMusic{
                         width: '100vw',
                         height: '100vh',
                         background: set.background,
-                        backgroundImage: 'url("' + music[0].cover + '")',
+                        backgroundImage: set.coverShow?'url("' + music[0].cover + '")':'',
                         backgroundSize: '100vw 100vh',
                         fontSize: 0,
                         overflow: 'hidden',
                         userSelect: 'none'
                     });
-                    covers.push(container);
+                    set.coverShow?covers.push(container):0;
                     //按钮
                     let playBtn = z.addElementByArray([
                         'img',
@@ -182,12 +238,10 @@ class LMusic{
                             'click',() => {
                                 if(state){
                                     audio[now].pause();
-                                    state = 0;
-                                    playBtn.src = btn.play;
+                                    pauseSet();
                                 }else{
                                     audio[now].play();
-                                    state = 1;
-                                    playBtn.src = btn.pause;
+                                    playSet();
                                 }
                             }
                         ]
@@ -202,7 +256,6 @@ class LMusic{
                             height: min / w.innerWidth * 50 + 'vw'
                         });
                     });
-                    setAudio();
                 }
                 if(navigator.userAgent.toUpperCase().includes('Firefox'.toUpperCase())){
                     w.addEventListener('load',function(){
@@ -213,6 +266,83 @@ class LMusic{
                 }
             }
         }
+        //增加文本功能LMusic
+        let setTextLMusic = (set) => {
+            if(set.container != undefined){
+                //创建容器 获取窗口
+                let w = addContainer(set.container).contentWindow;
+                //更新容器
+                let container = w;
+                //增加文本功能LMusic的主要部分
+                let setLMusic = () => {
+                    //更新容器
+                    container = container.document.body;
+                    //设置容器样式
+                    Object.assign(container.style,{
+                        margin: 0,
+                        padding: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        background: set.btnBackground,
+                        backgroundImage: set.coverShow?'url("' + music[0].cover + '")':'',
+                        backgroundSize: '100vH 100vh',
+                        fontSize: 0,
+                        overflow: 'hidden',
+                        userSelect: 'none'
+                    });
+                    set.coverShow?covers.push(container):0;
+                    //按钮
+                    let playBtn = z.addElementByArray([
+                        'img',
+                        'src',btn[['play','pause'][state]],
+                        'style',[
+                            'margin','15vh',
+                            'width','70vh',
+                            'height','70vh'
+                        ],
+                        'function',[
+                            'click',() => {
+                                if(state){
+                                    audio[now].pause();
+                                    pauseSet();
+                                }else{
+                                    audio[now].play();
+                                    playSet();
+                                }
+                            }
+                        ]
+                    ],container);
+                    btns.push(playBtn);
+                    //文本部分
+                    let text = z.addElementByArray([
+                        'div',
+                        'innerHTML','正在播放：' + music[now].author + ' - ' + music[now].name,
+                        'style',[
+                            'display','inline-block',
+                            'vertical-align','top',
+                            'padding','0 10vh',
+                            'width','calc(100vw - 120vh)',
+                            'height','100vh',
+                            'background',set.textBackground,
+                            'white-space','nowrap',
+                            'text-overflow','ellipsis',
+                            'overflow','hidden',
+                            'color',set.textColor,
+                            'font-size','25vh',
+                            'line-height','100vh'
+                        ]
+                    ],container);
+                    texts.push(text);
+                }
+                if(navigator.userAgent.toUpperCase().includes('Firefox'.toUpperCase())){
+                    w.addEventListener('load',function(){
+                        setLMusic();
+                    });
+                }else{
+                    setLMusic();
+                }
+            }
+        };
         //音频媒体
         let audio = [];
         //创建媒体
@@ -220,32 +350,37 @@ class LMusic{
             audio.push(z.addElementByArray([
                 'audio',
                 'function',[
-                    'play',() => {
-                        state = 1;
-                        for(let i in btns){
-                            btns[i].src = btn.pause;
-                        }
+                    'play',playSet,
+                    'ended',(event) => {
+                        event.preventDefault();
+                        changeMusic();
                     },
-                    'end',() => {
-                        for(let i in btns){
-                            if(covers[i].localName == 'img'){
-                                covers[i].src = music[0].cover;
-                            }else{
-                                covers[i].backgroundImage = 'url("' + music[0].cover + '")';
-                            }
-                        }
+                    'error',() => {
+                        error = 1;
                     }
                 ]
             ]));
         }
-        setAudio();
-        setTimeout(() => {
-            audio[now].play();
-        },100);
         for(let i in modeset){
             if(modeset[i].mode == 'min'){
                 setMinLMusic(modeset[i]);
+            }else if(modeset[i].mode == 'text'){
+                setTextLMusic(modeset[i]);
             }
+        }
+        play.mode == 2?(() => {
+            if(play.mode == 2){
+                let arr = [];
+                for(let i in audio){
+                    arr.push(i);
+                }
+                now = arr[Math.round(Math.random() * (arr.length - 1))];
+                coverAndTextReload();
+            }
+        })():0;
+        setAudio();
+        if(play.auto){
+            audio[now].play();
         }
     }
 }

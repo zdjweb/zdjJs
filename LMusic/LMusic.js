@@ -163,7 +163,7 @@ class LMusic{
         };
         //切换音乐功能
         let changeMusic = () => {
-            audio[now].pause();
+            //audio[now].pause();
             audio[now].currentTime = 0;
             if(!play.mode){
                 now += 1;
@@ -217,7 +217,7 @@ class LMusic{
                         width: '100vw',
                         height: '100vh',
                         background: set.background,
-                        backgroundImage: set.coverShow?'url("' + music[0].cover + '")':'',
+                        backgroundImage: set.coverShow?'url("' + music[now].cover + '")':'',
                         backgroundSize: '100vw 100vh',
                         fontSize: 0,
                         overflow: 'hidden',
@@ -284,7 +284,7 @@ class LMusic{
                         width: '100vw',
                         height: '100vh',
                         background: set.btnBackground,
-                        backgroundImage: set.coverShow?'url("' + music[0].cover + '")':'',
+                        backgroundImage: set.coverShow?'url("' + music[now].cover + '")':'',
                         backgroundSize: '100vH 100vh',
                         fontSize: 0,
                         overflow: 'hidden',
@@ -351,6 +351,12 @@ class LMusic{
                 'audio',
                 'function',[
                     'play',playSet,
+                    'pause',() => {
+                        if(audio[now].currentTime != audio[now].duration){
+                            console.log(555);
+                            pauseSet();
+                        }
+                    },
                     'ended',(event) => {
                         event.preventDefault();
                         changeMusic();

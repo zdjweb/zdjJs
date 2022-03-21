@@ -353,7 +353,6 @@ class LMusic{
                     'play',playSet,
                     'pause',() => {
                         if(audio[now].currentTime != audio[now].duration){
-                            console.log(555);
                             pauseSet();
                         }
                     },

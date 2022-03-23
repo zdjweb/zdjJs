@@ -98,24 +98,10 @@ class LMusic{
             }
         }
         //修正自动播放设置
-        if(play.auto == undefined){
-            play.auto = false;
-        }else{
-            if(![true,false].includes(play.auto)){
-                play.auto = Boolean(play.auto);
-            }
-        }
+        play.auto = !!play.auto;
         //修正播放模式设置
-        if(play.mode == undefined){
-            play.mode = 0;
-        }else{
-            if(![0,1,2].includes(play.mode)){
-                play.mode = parseInt(play.mode);
-                if(![0,1,2].includes(play.mode)){
-                    play.mode = 0;
-                }
-            }
-        }
+        play.mode = +play.mode;
+        [0,1,2].includes(play.mode) ? 0 : play.mode = 0;
         //初始化音频媒体
         let setAudio = () => {
             audio[now].src = music[now].src;

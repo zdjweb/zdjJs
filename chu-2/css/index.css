@@ -1,0 +1,41 @@
+* {
+    font-size: 0;
+    user-select: none;
+    overflow: hidden;
+}
+body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    cursor: url("../cursor/cursor.cur"), auto;
+}
+#loading {
+    z-index: 6;
+    top: 0;
+    left: 0;
+    text-align: center;
+    line-height: 100vh;
+    background: #000000;
+    cursor: url("../cursor/loading.cur"), auto;
+}
+#loading img {
+    width: 8vw;
+}
+.page {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: #FFFFFF;
+}
+.bg {
+    position: fixed;
+    z-index: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+}
+#img {
+    position: fixed;
+    top: 100vh;
+}

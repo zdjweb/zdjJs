@@ -34,12 +34,23 @@ class VPicture{
             },
             //背景颜色
             background: {
-                get: () => background
+                get: () => background,
+                set: (uIn) => {
+                    container.style.background = background = uIn;
+                }
+            },
+            //图片地址
+            src: {
+                get: () => picture.src,
+                set: (uIn) => {
+                    container.removeChild(picture);
+                    picture = null;
+                    setPicture.src = uIn;
+                }
             },
             //图片信息
             picture: {
                 get: () => ({
-                    src: picture.src,
                     width: width,
                     height: height,
                     aspectRatio: width / height,
@@ -50,7 +61,12 @@ class VPicture{
             },
             //图片显示倍数
             times: {
-                get: () => times
+                get: () => times,
+                set: (uIn) => {
+                    times = uIn < 0.1?0.1:(uIn > 5)?5:uIn;
+                    timesTimes = Math.round((times - 1) / 0.1);
+                    pictureCssReSet();
+                }
             }
         });
         //创建zdjJs对象
@@ -285,7 +301,7 @@ class VPicture{
             container.addEventListener('mouseup',end);
             //页面大小改变事件
             w.addEventListener('resize',() => {
-                if(picture != undefined){
+                if(picture != null){
                     pictureCssReSet(1);
                 }
             });
@@ -327,26 +343,6 @@ class VPicture{
         }else{
             setVPicture();
         }
-        //修改图片地址
-        this.changeSrc = (src) => {
-            container.removeChild(picture);
-            picture = undefined;
-            setPicture.src = src;
-        }
-        //修改图片大小
-        this.changeTimes = (uTimes) => {
-            if(uTimes < 0.1){
-                times = 0.1;
-                timesTimes = -9;
-            }else if(uTimes > 5){
-                times = 5;
-                timesTimes = 40;
-            }else{
-                times = uTimes;
-                timesTimes = (times - 1) / 0.1;
-            }
-            pictureCssReSet();
-        }
         //下载图片
         this.download = () => {
             let b = new XMLHttpRequest();
@@ -365,10 +361,6 @@ class VPicture{
                 }
             }
             b.send();
-        }
-        //修改背景颜色
-        this.changeBackground = (color) => {
-            container.style.background = background = color;
         }
         //设置点击事件
         this.setClickFunction = (uFunction) => {

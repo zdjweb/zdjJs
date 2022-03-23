@@ -24,17 +24,18 @@
         });
         //功能演示代码
         setTimeout(() => {
-            vp.changeSrc('2.png');
+            vp.src = '2.png';
             setTimeout(() => {
-                vp.changeTimes(0.5);
+                vp.times = 0.5;
                 setTimeout(() => {
-                    vp.changeBackground('#99CCFF');
+                    vp.background = '#99CCFF';
                     setTimeout(() => {
                         vp.setClickFunction(() => {
-                            vp.changeSrc(Math.round(Math.random()) + 1 + '.png');
+                            vp.src = Math.round(Math.random()) + 1 + '.png';
                             let arr = ['#99CCFF','#f6b05e','#C8C8FA'];
                             arr.splice(arr.indexOf(vp.background),1);
-                            vp.changeBackground(arr[Math.round(Math.random())]);
+                            vp.background = arr[Math.round(Math.random())];
+                            console.log(a);
                         });
                     },1000);
                 },1000);

@@ -1,10 +1,6 @@
 //TSelect类
 class TSelect{
     constructor(e){
-        //错误状态码
-        let eCode = 0;
-        //错误信息
-        let eMsg = '';
         //当前选择选项的编号
         let code = 0;
         //选项值
@@ -21,14 +17,6 @@ class TSelect{
             //设置信息
             set: {
                 get: () => e
-            },
-            //错误状态码
-            eCode: {
-                get: () => eCode
-            },
-            //错误信息
-            eMsg: {
-                get: () => eMsg
             },
             //选项数量
             number: {

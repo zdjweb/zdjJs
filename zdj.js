@@ -162,22 +162,6 @@ class zdjJs{
                     }
                 }
             },
-            //获取最大值
-            getMax: {
-                get: () => {
-                    return (uArr) => {
-                        let max = uArr != undefined?(uArr.length?uArr[0]:'error'):'error';
-                        if(max == 'error'){
-                            return max;
-                        }else{
-                            for(let i in uArr){
-                                uArr[i] > max?max = uArr[i]:0;
-                            }
-                        }
-                        return max;
-                    }
-                }
-            },
             //设置用于创建页面的数组
             setPage: {
                 get: () => {

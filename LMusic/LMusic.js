@@ -23,6 +23,15 @@ class LMusic{
             state: {
                 get: () => {
                     return state;
+                },
+                set: (uIn) => {
+                    (uIn?() => {
+                        audio[now].play();
+                        playSet();
+                    }:() => {
+                        audio[now].pause();
+                        pauseSet();
+                    })();
                 }
             },
             //当前播放的音乐
@@ -40,6 +49,8 @@ class LMusic{
                         //封面地址
                         cover: music[now].cover
                     }
+                },
+                set: (uIn) => {
                 }
             },
         });

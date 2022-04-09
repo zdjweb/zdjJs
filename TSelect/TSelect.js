@@ -51,6 +51,7 @@ class TSelect{
                 set(sCode){
                     if(sCode >= 0 && sCode < this.number){
                         code = sCode;
+                        msgBox.style.marginTop = msgBox.style.marginTop = maxMarginTop - code * (e.line.height + msgHeight) + 'vh';
                     }
                 }
             },
@@ -392,17 +393,6 @@ class TSelect{
             }
             this._msgBox.style.marginTop = this._msgBox.style.marginTop = this._maxMarginTop - this.code * (this.set.line.height + this._msgHeight) + 'vh';
             this.number == 1?this.valueChangeFunction():0;
-        }
-    }
-    //设置选中指定值
-    get setValue(){
-        return function(code){
-            if(code >= 0 && code < this.number){
-                this.code = code;
-                this.value = this.values[code];
-                this._msgBox.style.marginTop = this._msgBox.style.marginTop = this._maxMarginTop - code * (this.set.line.height + this._msgHeight) + 'vh';
-                this.valueChangeFunction();
-            }
         }
     }
     //设置值更改时执行的函数

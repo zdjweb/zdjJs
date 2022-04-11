@@ -11,6 +11,9 @@ class TSelect{
         }else{
 
         }
+        for(let i in values){
+            values[i] = String(values[i]);
+        }
         //选项信息容器
         let msgBox;
         //选项信息
@@ -104,6 +107,12 @@ class TSelect{
                 },
                 set(sMinMarginTop){
                     minMarginTop = sMinMarginTop;
+                }
+            },
+            //值更改时执行的函数
+            _valueChangeFunction: {
+                set(Function){
+                    valueChangeFunction = Function; 
                 }
             }
         });
@@ -255,9 +264,8 @@ class TSelect{
                     if(z.strRemove(msgBox.style.marginTop) + marginMove >= maxMarginTop){
                         msgBox.style.marginTop = maxMarginTop + 'vh';
                         if(code != 0){
-                            valueChangeFunction();
+                            valueChangeFunction(code = 0);
                         }
-                        code = 0;
                         clearInterval(timer);
                     }else{
                         msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) + marginMove + 'vh';
@@ -266,9 +274,8 @@ class TSelect{
                     if(z.strRemove(msgBox.style.marginTop) - marginMove <= minMarginTop){
                         msgBox.style.marginTop = minMarginTop + 'vh';
                         if(code != values.length - 1){
-                            valueChangeFunction();
+                            valueChangeFunction(code = values.length - 1);
                         }
-                        code = values.length - 1;
                         clearInterval(timer);
                     }else{
                         msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) - marginMove + 'vh';
@@ -280,9 +287,8 @@ class TSelect{
                                 if(z.strRemove(msgBox.style.marginTop) - marginMove <= maxMarginTop - i * (lineHeight + msgHeight)){
                                     msgBox.style.marginTop = maxMarginTop - i * (lineHeight + msgHeight) + 'vh';
                                     if(code != i){
-                                        valueChangeFunction();
+                                        valueChangeFunction(code = i);
                                     }
-                                    code = i;
                                     clearInterval(timer);
                                     break;
                                 }else{
@@ -292,9 +298,8 @@ class TSelect{
                                 if(z.strRemove(msgBox.style.marginTop) + marginMove >= maxMarginTop - i * (lineHeight + msgHeight)){
                                     msgBox.style.marginTop = maxMarginTop - i * (lineHeight + msgHeight) + 'vh';
                                     if(code != i){
-                                        valueChangeFunction();
+                                        valueChangeFunction(code = i);
                                     }
-                                    code = i;
                                     clearInterval(timer);
                                     break;
                                 }else{
@@ -346,7 +351,7 @@ class TSelect{
     //修改指定选项
     get changeValue(){
         return function(code,value){
-            if(code >= 0 && code < this.values.length && !this.values.includes(value)){
+            if(code >= 0 && code < this.values.length && !this.checkValue(value)){
                 this._msg[code].innerHTML = this.values[code] = value;
             }
         }
@@ -370,36 +375,50 @@ class TSelect{
                 }
                 this._msgBox.style.marginTop = this._msgBox.style.marginTop = this._maxMarginTop - this.code * (this.set.line.height + this._msgHeight) + 'vh';
                 f?this.valueChangeFunction():0;
+            }else{
+                this.deleteValue(this.number - 1);
             }
         }
     }
     //在指定位置增加选项
     get addValue(){
         return function(value,code){
-            const newMsg = this._addMag(value);
-            if(code != undefined){
-                this.values.splice(code,0,value);
-                this._msgBox.insertBefore(newMsg,this._msg[code]);
-                this._msg.splice(code,0,newMsg);
-            }else{
-                this.values.push(value);
-                this._msg.push(newMsg);
-                this._msgBox.appendChild(newMsg);
-                code = 0;
+            if(!this.checkValue(value = String(value))){
+                if(code >= 0 && code <= this.number){
+                    const newMsg = this._addMag(value);
+                    this.values.splice(code,0,value);
+                    this._msg.splice(code,0,newMsg);
+                    code < this.number - 1?this._msgBox.insertBefore(newMsg,this._msg[code]):this._msgBox.appendChild(newMsg);
+                    this._minMarginTop = this._maxMarginTop - (this.number - 1) * (this.set.line.height + this._msgHeight);
+                    if(code <= this.code){
+                        this.code++;
+                    }
+                    this._msgBox.style.marginTop = this._msgBox.style.marginTop = this._maxMarginTop - this.code * (this.set.line.height + this._msgHeight) + 'vh';
+                    this.number == 1?this.valueChangeFunction():0;
+                }else{
+                    this.addValue(value,this.number);
+                }
             }
-            this._minMarginTop = this._maxMarginTop - (this.number - 1) * (this.set.line.height + this._msgHeight);
-            if(code <= this.code){
-                this.code++;
+        }
+    }
+    //检查选项是否存在
+    get checkValue(){
+        return function(value){
+            return this.values.includes(String(value));
+        }
+    }
+    //清空所有选项
+    get clearValues(){
+        return function(){
+            while(this.number){
+                this.deleteValue();
             }
-            this._msgBox.style.marginTop = this._msgBox.style.marginTop = this._maxMarginTop - this.code * (this.set.line.height + this._msgHeight) + 'vh';
-            this.number == 1?this.valueChangeFunction():0;
         }
     }
     //设置值更改时执行的函数
     get setValueChangeFunction(){
         return function(Function){
-            console.log(this);
-            this.valueChangeFunction = Function;
+            this._valueChangeFunction = Function;
         }
     }
-}
+};

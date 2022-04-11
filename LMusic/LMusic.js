@@ -385,4 +385,12 @@ class LMusic{
             audio[now].play();
         }
     }
+    //版本信息
+    get version(){
+        return '1.0.0';
+    }
+    //作者信息
+    get author(){
+        return 'zdj0123';
+    }
 }

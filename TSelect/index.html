@@ -20,6 +20,7 @@
         const ts = new TSelect({
             container: document.body,
             values: [0, 0, 1, 2, 3],
+            suffix: '个',
             number: 5,
             background: '#FFFFFF',
             font: {
@@ -44,6 +45,7 @@
                     ts.addValue(+ts.values[0] - 1, 0);
                 }
                 */
+               console.log(ts.values);
             }
         });
     </script>

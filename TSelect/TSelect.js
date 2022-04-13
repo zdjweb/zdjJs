@@ -27,14 +27,6 @@ class TSelect {
         let code = 0;
         //选项值
         const values = {};
-        //获取、修正选项值
-        if(Array.isArray(e.values)) {
-            for(const i in e.values) {
-                this.checkValue(e.values[i]) < 0?values[i] = String(e.values[i]):0;
-            }
-        }else {
-
-        }
         //刚刚选中的选项值
         let lastValue = values[0];
         //选项改变的方向
@@ -147,6 +139,14 @@ class TSelect {
                 }
             },
         });
+        //获取、修正选项值
+        if(Array.isArray(e.values)) {
+            for(const i in e.values) {
+                this.checkValue(e.values[i]) < 0?values[this.number] = String(e.values[i]):0;
+            }
+        }else {
+
+        }
         //创建zdjJs对象
         const z = new zdjJs;
         //创建容器

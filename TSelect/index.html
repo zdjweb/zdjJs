@@ -19,7 +19,7 @@
     <script>
         const ts = new TSelect({
             container: document.body,
-            values: [0,1],
+            values: [0, 0, 1, 2, 3],
             number: 5,
             background: '#FFFFFF',
             font: {
@@ -44,9 +44,6 @@
                     ts.addValue(+ts.values[0] - 1, 0);
                 }
                 */
-                while(this.number < 1000){
-                    setTimeout(ts.addValue(+ts.values[ts.number - 1] + 1), this.number * 100);
-                }
             }
         });
     </script>

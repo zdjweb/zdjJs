@@ -17,9 +17,9 @@
     <script src="../zdj.js"></script>
     <script src="TSelect.js"></script>
     <script>
-        let ts = new TSelect({
+        const ts = new TSelect({
             container: document.body,
-            values: [0,1,2,3],
+            values: [0,1],
             number: 5,
             background: '#FFFFFF',
             font: {
@@ -29,8 +29,26 @@
             line: {
                 height: 1,
                 background: '#EEEEEE'
+            },
+            valueChangeFunction: function() {
+                /*
+                if(ts.direction > 0) {
+                    while(ts.number > 2) {
+                        ts.deleteValue(0);
+                    }
+                    ts.addValue(+ts.values[ts.number - 1] + 1);
+                }else {
+                    while(ts.number > 2) {
+                        ts.deleteValue();
+                    }
+                    ts.addValue(+ts.values[0] - 1, 0);
+                }
+                */
+                while(this.number < 1000){
+                    setTimeout(ts.addValue(+ts.values[ts.number - 1] + 1), this.number * 100);
+                }
             }
-        })
+        });
     </script>
 </body>
 </html>

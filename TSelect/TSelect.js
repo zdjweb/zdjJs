@@ -30,7 +30,7 @@ class TSelect {
         //选项值
         const values = {};
         //刚刚选中的选项值
-        let lastValue = values[0];
+        let lastValue;
         //选项改变的方向
         let direction = 1;
         //选项信息容器
@@ -154,6 +154,7 @@ class TSelect {
         } else {
 
         }
+        lastValue = values[0];
         //创建zdjJs对象
         const z = new zdjJs;
         //创建容器

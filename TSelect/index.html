@@ -20,7 +20,7 @@
         const ts = new TSelect({
             container: document.body,
             values: [0, 0, 1, 2, 3],
-            suffix: '个',
+            suffix: 'ZZAG',
             number: 5,
             background: '#FFFFFF',
             font: {
@@ -45,7 +45,10 @@
                     ts.addValue(+ts.values[0] - 1, 0);
                 }
                 */
-               console.log(ts.values);
+                while (this.number < 5) {
+                    ts.addValue(Number(ts.values[this.number - 1]) + 1);
+                }
+                console.log(6);
             }
         });
     </script>

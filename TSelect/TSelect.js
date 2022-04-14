@@ -222,7 +222,7 @@ class TSelect {
                             code < this.number - 1 ? msgBox.insertBefore(newMsg, msg[code]) : msgBox.appendChild(newMsg);
                             msg.splice(code, 0, newMsg);
                             minMarginTop = maxMarginTop - (this.number - 1) * (e.line.height + msgHeight);
-                            this.code = code <= this.code ? ++this.code : this.code;
+                            this.code = this.number == 1 ? 0 : (code <= this.code ? ++this.code : this.code);
                         } else {
                             this.addValue(value, this.number);
                         }
@@ -483,7 +483,6 @@ class TSelect {
             };
             // 增加选项信息
             addMsg = (code) => {
-                console.log(values);
                 return z.addElementByArray([
                     'div',
                     'innerHTML', getFullValue(code),

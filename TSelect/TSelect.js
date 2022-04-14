@@ -14,7 +14,26 @@ class TSelect {
             // 检查values属性是否存在 如果不存在则将其设为空数组
             e.values == null ? e.values = [] : (() => {
                 // 如果存在则检查values属性是否是数组 如果是数组则进行复制
-                Array.isArray(e.values) ? e.values = [...e.values] : 0;
+                Array.isArray(e.values) ? e.values = [...e.values] : (() => {
+                    const limit = e.values.split('~');
+                    limit[2] = limit[0] = +limit[0];
+                    limit[1] = +limit[1].split('+=')[0];
+                    if (limit[0] > limit[1]) {
+                        limit[0] = limit[1] - limit[0];
+                        limit[1] = limit[1] - limit[0];
+                        limit[0] = limit[0] + limit[1];
+                    }
+                    const plus = +e.values.split('+=')[1].split('%')[0];
+                    const number = e.values.split('==');
+                    number[0] = +number[0].split('%')[1];
+                    number[1] = +number[1];
+                    e.values = [];
+                    for (let i = limit[2]; i >= limit[0] && i <= limit[1]; i += plus) {
+                        if (i % number[0] == number[1]) {
+                            e.values.push(i);
+                        }
+                    }
+                })();
             })();
             // 检查prefix属性是否存在 如果不存在则将其设为空字符串 如果存在则需保证是字符串
             e.prefix = e.prefix == null ? '' : String(e.prefix);

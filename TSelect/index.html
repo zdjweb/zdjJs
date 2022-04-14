@@ -20,7 +20,8 @@
         const ts = new TSelect({
             container: document.body,
             values: [0, 0, 1, 2, 3],
-            suffix: 'ZZAG',
+            prefix: '第',
+            suffix: '个',
             number: 5,
             background: '#FFFFFF',
             font: {
@@ -32,22 +33,6 @@
                 background: '#EEEEEE'
             },
             valueChangeFunction: function() {
-                /*
-                if(ts.direction > 0) {
-                    while(ts.number > 2) {
-                        ts.deleteValue(0);
-                    }
-                    ts.addValue(+ts.values[ts.number - 1] + 1);
-                }else {
-                    while(ts.number > 2) {
-                        ts.deleteValue();
-                    }
-                    ts.addValue(+ts.values[0] - 1, 0);
-                }
-                */
-                while (this.number < 5) {
-                    ts.addValue(Number(ts.values[this.number - 1]) + 1);
-                }
                 console.log(6);
             }
         });

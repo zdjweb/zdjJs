@@ -1,62 +1,147 @@
-//TSelect类
+// TSelect类
 class TSelect {
+    // 构造函数
     constructor(e) {
         // 检查容器是否存在
         if (e.container == null) {
+            // 如果不存在则直接返回
             return;
         }
+        // 创建一个新的e
         const getNewE = () => {
-            const newE = {...e};
-            newE.values == null ? newE.values = [] : 0;
-            Array.isArray(newE.values) ? newE.values = [...newE.values] : 0;
-            newE.suffix == null ? newE.suffix = '' : 0;
-            newE.number == null ? newE.number = 5 : 0;
-            newE.background == null ? newE.background = '#FFFFFF' : 0;
-            newE.font == null ? newE.font = {} : 0;
-            newE.font = {...e.font};
-            newE.font.size == null ? newE.font.size = 1 : 0;
-            newE.font.color == null ? newE.font.color = '#807F7F' : 0;
-            newE.font.line == null ? newE.font.line = {} : 0;
-            newE.line = {...e.line};
-            newE.line.height == null ? newE.line.height = 1 : 0;
-            newE.line.background == null ? newE.line.background = '#EEEEEE' : 0;
-            newE.valueChangeFunction == null ? newE.valueChangeFunction = () => {} : 0;
-            newE.valueChangeFunction = eval(`(${newE.valueChangeFunction.toString()})`);
-            return newE;
+            // 对原有的e进行简单的复制
+            e = {...e};
+            // 检查values属性是否存在 如果不存在则将其设为空数组
+            e.values == null ? e.values = [] : (() => {
+                // 如果存在则检查values属性是否是数组 如果是数组则进行复制
+                Array.isArray(e.values) ? e.values = [...e.values] : 0;
+            })();
+            // 检查prefix属性是否存在 如果不存在则将其设为空字符串 如果存在则需保证是字符串
+            e.prefix = e.prefix == null ? '' : String(e.prefix);
+            // 检查suffix属性是否存在 如果不存在则将其设为空字符串 如果存在则需保证是字符串
+            e.suffix = e.suffix == null ? '' : String(e.suffix);
+            // 检查number属性是否存在 如果不存在则将其设为5
+            e.number == null ? e.number = 5 : (() => {
+                // 如果存在则需保证是数值类型并且是整数 如果不是则将其设为5
+                typeof (e.number = parseInt(e.number)) == 'number' && !isNaN(e.number) ? (() => {
+                    // 如果是则需保证其不小于1
+                    e.number < 1 ? e.number = 1 : (() => {
+                        // 如果不小于1则需保证其不大于15
+                        e.number > 15 ? e.number = 15 : 0;
+                    })();
+                })() : e.number = 5;
+            })();
+            // 检查background属性是否存在 如果不存在则将其设为'#FFFFFF' 如果存在则需保证是字符串
+            e.background = e.background == null ? '#FFFFFF' : String(e.background);
+            // 检查font属性是否存在 如果不存在则将其设为空对象 如果存在则进行复制
+            e.font == null ? e.font = {} : e.font = {...e.font};
+            // 检查font属性是否存在size属性 如果不存在则将其设为1
+            e.font.size == null ? e.font.size = 1 : (() => {
+                // 如果存在则需保证是数值类型 如果不是则将其设为1
+                typeof (e.font.size = parseFloat(e.font.size)) == 'number' && !isNaN(e.font.size) ? (() => {
+                    // 如果是则需保证其不小于0.3
+                    e.font.size < 0.3 ? e.font.size = 0.3 : (() => {
+                        // 如果不小于0.3则需保证其不大于1.25
+                        e.font.size > 1.25 ? e.font.size = 1.25 : 0;
+                    })();
+                })() : e.font.size = 1;
+            })();
+            // 检查font属性是否存在color属性 如果不存在则将其设为'#807F7F' 如果存在则需保证是字符串
+            e.font.color = e.font.color == null ? '#807F7F' : String(e.font.color);
+            // 检查line属性是否存在 如果不存在则将其设为空对象
+            e.line == null ? e.line = {} : e.line = {...e.line};
+            // 检查line属性是否存在height属性 如果不存在则将其设为1
+            e.line.height == null ? e.line.height = 1 : (() => {
+                // 如果存在则需保证是数值类型 如果不是则将其设为1
+                typeof (e.line.height = parseFloat(e.line.height)) == 'number' && !isNaN(e.line.height) ? (() => {
+                    // 如果是则需保证其不小于0.5
+                    e.line.height < 0.5 ? e.line.height = 0.5 : (() => {
+                        // 如果不小于0.5则需保证其不大于1.25
+                        e.line.height > 1.25 ? e.line.height = 1.25 : 0;
+                    })();
+                })() : e.line.height = 1;
+            })();
+            // 检查line属性是否存在background属性 如果不存在则将其设为'#EEEEEE' 如果存在则需保证是字符串
+            e.line.background = e.line.background == null ? '#EEEEEE' : String(e.line.background);
+            // 检查valueChangeFunction属性是否存在 如果不存在则将其设为空函数 如果存在则进行复制
+            e.valueChangeFunction = e.valueChangeFunction == null ? () => {} : eval(`(${e.valueChangeFunction})`);
+            return e;
         };
+        // 获取一个新的e
         e = getNewE();
-        //当前选择选项的编号
+        // 当前选择选项的编号
         let code = 0;
-        //选项值
+        // 选项值
         const values = {};
-        //刚刚选中的选项值
+        // 前缀
+        let prefix = e.prefix;
+        // 后缀
+        let suffix = e.suffix;
+        // 刚刚选中的选项值
         let lastValue;
-        //选项改变的方向
+        // 选项改变的方向
         let direction = 1;
-        //选项信息容器
+        // 选项信息容器
         let msgBox;
-        //选项信息
+        // 选项信息
         const msg = [];
-        //选项信息高度
+        // 选项信息高度
         let msgHeight;
-        //最大marginTop
+        // 最大marginTop
         let maxMarginTop;
-        //最小marginTop
+        // 最小marginTop
         let minMarginTop;
-        //增加选项信息
+        // 增加选项信息
         let addMsg;
-        //值更改时执行的函数
+        // 值更改时执行的函数
         let valueChangeFunction = e.valueChangeFunction;
+        // 获取选项完整值
+        const getFullValue = (code) => {
+            return prefix + values[code] + suffix;
+        };
+        // 设置访问器属性
         Object.defineProperties(this, {
-            //设置信息
+            // 设置信息
             set: {
                 get: () => getNewE()
             },
-            //选项
+            // 选项值
             values: {
                 get: () => values
             },
-            //选项数量
+            // 前缀
+            prefix: {
+                get: () => prefix,
+                set(sPrefix) {
+                    sPrefix != prefix ? (prefix = String(sPrefix) || 1) && (() => {
+                        for (const i in msg) {
+                            msg[i].innerHTML = getFullValue(i);
+                        }
+                    })() : 0;
+                }
+            },
+            // 后缀
+            suffix: {
+                get: () => suffix,
+                set(sSuffix) {
+                    sSuffix != suffix ? (suffix = String(sSuffix) || 1) && (() => {
+                        for (const i in msg) {
+                            msg[i].innerHTML = getFullValue(i);
+                        }
+                    })() : 0;
+                }
+            },
+            // 完整选项值
+            fullValues: {
+                get() {
+                    const newValues = {};
+                    for (const i in values) {
+                        newValues[i] = getFullValue(i);
+                    }
+                    return newValues;
+                }
+            },
+            // 选项数量
             number: {
                 get() {
                     let number = 0;
@@ -68,17 +153,17 @@ class TSelect {
                     return number;
                 }
             },
-            //当前选择选项的编号
+            // 当前选择选项的编号
             code: {
                 get: () => code,
                 set(sCode) {
                     if (sCode >= 0 && sCode < this.number || sCode == 0) {
                         msgBox.style.marginTop = maxMarginTop - (code = sCode) * (e.line.height + msgHeight) + 'vh';
-                        this._changeCheck(values[code]);
+                        this._changeCheck();
                     }
                 }
             },
-            //当前选择选项的值
+            // 当前选择的选项值
             value: {
                 get: () => values[code],
                 set(value) {
@@ -87,11 +172,11 @@ class TSelect {
                     }
                 }
             },
-            //当前选择选项的完整值
+            // 当前选择的完整选项值
             fullValue: {
-                get: () => this.value + e.suffix
+                get: () => this.isEmpty ? undefined : getFullValue(code)
             },
-            //刚刚选中的选项值
+            // 刚刚选中的选项值
             lastValue: {
                 get() {
                     const value = lastValue;
@@ -104,73 +189,124 @@ class TSelect {
                     return value;
                 }
             },
-            //选项改变的方向
+            // 选项改变的方向
             direction: {
                 get: () => direction
             },
-            //选项信息容器
-            _msgBox: {
-                get: () => msgBox
-            },
-            //选项信息
-            _msg: {
-                get: () => msg
-            },
-            //选项信息高度
-            _msgHeight: {
-                get: () => msgHeight
-            },
-            //最大marginTop
-            _maxMarginTop: {
-                get: () => maxMarginTop,
-                set(sMaxMarginTop) {
-                    maxMarginTop = sMaxMarginTop;
-                }
-            },
-            //最小marginTop
-            _minMarginTop: {
-                get: () => minMarginTop,
-                set(sMinMarginTop) {
-                    minMarginTop = sMinMarginTop;
-                }
-            },
-            //增加选项信息
-            _addMsg: {
-                get: () => eval(addMsg.toString())
-            },
-            //值更改时执行的函数
-            _valueChangeFunction: {
-                get: () => eval(`(${valueChangeFunction.toString()})`),
+            // 值更改时执行的函数
+            valueChangeFunction: {
+                get: () => eval(`(${valueChangeFunction})`),
                 set(Function) {
-                    valueChangeFunction = eval(`(${Function.toString()})`);
+                    valueChangeFunction = eval(`(${Function})`);
                 }
             },
+            // 检查是否为空
+            isEmpty: {
+                get: () => this.number == 0
+            },
+            // 检查选中的选项是否改变
+            _changeCheck: {
+                get: () => () => !(this.value == this.lastValue) ? this.valueChangeFunction() : 0
+            },
+            // 在指定位置增加选项
+            addValue: {
+                get: () => function(value,code) {
+                    if (this.checkValue(value) < 0) {
+                        if (code >= 0 && code <= this.number) {
+                            let i = this.number - 1;
+                            while (i >= code) {
+                                values[i + 1] = values[i--];
+                            }
+                            values[code] = String(value);
+                            const newMsg = addMsg(code);
+                            code < this.number - 1 ? msgBox.insertBefore(newMsg, msg[code]) : msgBox.appendChild(newMsg);
+                            msg.splice(code, 0, newMsg);
+                            minMarginTop = maxMarginTop - (this.number - 1) * (e.line.height + msgHeight);
+                            this.code = code <= this.code ? ++this.code : this.code;
+                        } else {
+                            this.addValue(value, this.number);
+                        }
+                    }
+                }
+            },
+            // 删除指定选项
+            deleteValue: {
+                get: () => function(code) {
+                    if (code >= 0 && code < this.number) {
+                        values[code] = null;
+                        let i = code;
+                        while (i < this.number) {
+                            values[i] = values[i++ + 1];
+                        }
+                        for (const i in values) {
+                            values[i] == null ? delete values[i] : 0;
+                        }
+                        msgBox.removeChild(msg[code]);
+                        msg.splice(code,1);
+                        minMarginTop = maxMarginTop - (this.number - 1) * (e.line.height + msgHeight);
+                        this.code = this.isEmpty ? 0 : (this.code == this.number || this.code > code ? --this.code : this.code);
+                    } else {
+                        this.number ? this.deleteValue(this.number - 1) : 0;
+                    }
+                }
+            },
+            // 清空所有选项
+            clearValues: {
+                get: () => function() {
+                    while (this.number) {
+                        this.deleteValue();
+                    }
+                }
+            },
+            // 修改指定选项
+            changeValue: {
+                get: () => function(code,value) {
+                    if (code >= 0 && code < this.number && this.checkValue(value) < 0) {
+                        msg[code].innerHTML = prefix + (values[code] = String(value)) + suffix;
+                        this._changeCheck();
+                    }
+                }
+            },
+            // 检查选项是否存在
+            checkValue: {
+                get: () => function(value) {
+                    for (const i in values) {
+                        if (values[i] === String(value)) {
+                            return Number(i);
+                        }
+                    }
+                    return -1;
+                }
+            }
         });
-        //获取、修正选项值
+        // 判断设置信息中的values属性是否是数组
         if (Array.isArray(e.values)) {
+            // 如果是数组则进行遍历
             for (const i in e.values) {
+                // 将选项存入values变量并保证唯一
                 this.checkValue(e.values[i]) < 0 ? values[this.number] = String(e.values[i]) : 0;
             }
         } else {
 
         }
+        // 将lastValue的值初始化为第一个选项的值
         lastValue = values[0];
-        //创建zdjJs对象
+        // 创建一个zdjJs对象
         const z = new zdjJs;
-        //创建容器
+        // 创建容器
         let container = z.addElementByArray([
             'iframe',
-            'style',[
-                'width','100%',
-                'height','100%',
-                'border',0
+            'style', [
+                'width', '100%',
+                'height', '100%',
+                'border', 0
             ]
         ], e.container);
-        //结束事件
+        // 结束事件
         let end;
-        //移出事件
+        // 判断是否移出TSelect范围
         const outFunction = (event) => {
-            if (!event.touches){
+            if (!event.touches) {
                 if (event.clientX <= 0 || event.clientX >= w.innerWidth || event.clientY <= 0 || event.clientY >= w.innerHeight) {
                     end();
                     return true;
@@ -183,9 +319,11 @@ class TSelect {
             }
             return false;
         };
-        //获取窗口
-        const w = container.contentWindow;
+        // 获取窗口并更新容器
+        const w = container = container.contentWindow;
+        // 给窗口绑定移出判断事件
         w.addEventListener('mouseout', outFunction);
+        // 给窗口绑定按键事件
         w.addEventListener('keydown', (event) => {
             if (['w', 'a', '8', '4', '-', 'ArrowUp', 'ArrowLeft'].includes(event.key)) {
                 this.code--;
@@ -193,14 +331,10 @@ class TSelect {
                 this.code++;
             }
         });
-        //更新容器
-        container = w;
-        //设置TSelect主要部分
+        // 设置TSelect主要部分
         const setTSelect = () => {
-            //更新容器
-            container = container.document.body;
-            //设置容器样式
-            Object.assign(container.style, {
+            // 更新容器并设置容器样式
+            Object.assign((container = container.document.body).style, {
                 margin: 0,
                 padding: 0,
                 width: '100vw',
@@ -209,24 +343,24 @@ class TSelect {
                 fontSize: 0,
                 overflow: 'hidden'
             });
-            //获取系统设置导致字体放大的倍数
+            // 获取系统设置导致字体放大的倍数
             z.getFontTimes(container);
-            //设置字体大小单位
+            // 设置字体大小单位
             z.setFontSuffix('vh');
-            //样式修正定时器
+            // 样式修正定时器
             let timer;
-            //刚刚移动的距离
+            // 刚刚移动的距离
             let lastY;
-            //现在移动的距离
+            // 现在移动的距离
             let nowY;
-            //开始事件
+            // 开始事件
             const start = (event) => {
                 event.preventDefault();
                 clearInterval(timer);
                 nowY = !event.touches ? event.clientY : event.touches[0].clientY;
                 w.focus();
             };
-            //移动事件
+            // 移动事件
             const move = (event) => {
                 event.preventDefault();
                 if (nowY != null) {
@@ -249,13 +383,14 @@ class TSelect {
                     }
                 }
             };
+            // 结束事件
             end = () => {
                 if (nowY != null) {
                     nowY = null;
                     timer = setInterval(msgBoxReSet, 5);
                 }
             };
-            //创建容器
+            // 创建容器
             container = z.addElementByArray([
                 'main',
                 'style', [
@@ -271,41 +406,42 @@ class TSelect {
                     'mouseup', end
                 ]
             ], container);
-            //选项信息高度
+            // 选项信息高度
             msgHeight = (100 - (e.number - 1) * e.line.height) / e.number;
-            //最大marginTop
+            // 最大marginTop
             maxMarginTop = msgHeight * parseInt(e.number / 2) + e.line.height * (parseInt(e.number / 2) - 1);
-            //最小marginTop
+            // 最小marginTop
             minMarginTop = maxMarginTop - (this.number - 1) * (e.line.height + msgHeight);
-            //选择线
+            // 选择线
             for (let i = 0; i < 2; i++) {
                 z.addElementByArray([
                     'div',
-                    'style',[
-                        'position','fixed',
-                        'z-index',-1,
-                        'top',maxMarginTop + (msgHeight + e.line.height) * i + 'vh',
-                        'left',0,
-                        'margin','',
-                        'width','100%',
-                        'height',e.line.height + '%',
-                        'background',e.line.background
+                    'style', [
+                        'position', 'fixed',
+                        'z-index', -1,
+                        'top', maxMarginTop + (msgHeight + e.line.height) * i + 'vh',
+                        'left', 0,
+                        'margin', '',
+                        'width', '100%',
+                        'height', e.line.height + '%',
+                        'background', e.line.background
                     ]
                 ], container);
             }
-            //选项信息容器
+            // 选项信息容器
             msgBox = z.addElementByArray([
                 'div',
-                'style',[
-                    'display','inline-block',
-                    'margin-top',maxMarginTop + 'vh',
-                    'width','100%'
+                'style', [
+                    'display', 'inline-block',
+                    'margin-top', maxMarginTop + 'vh',
+                    'width', '100%'
                 ]
             ], container);
+            // 选项信息容器重设已经选择选项更新
             const msgBoxReSet = () => {
-                //用于计算的选择线高度
+                // 用于计算的选择线高度
                 const lineHeight = e.line.height;
-                //一次移动的距离
+                // 一次移动的距离
                 const marginMove = (lineHeight + msgHeight) / 50;
                 if (z.strRemove(msgBox.style.marginTop) >= maxMarginTop - (lineHeight + msgHeight / 2)) {
                     if (z.strRemove(msgBox.style.marginTop) + marginMove >= maxMarginTop) {
@@ -322,7 +458,7 @@ class TSelect {
                         msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) - marginMove + 'vh';
                     }
                 } else {
-                    for (let i = 1;i < this.number - 1;i++) {
+                    for (let i = 1; i < this.number - 1; i++) {
                         if (z.strRemove(msgBox.style.marginTop) <= maxMarginTop - i * (lineHeight + msgHeight) + msgHeight / 2 && z.strRemove(msgBox.style.marginTop) >= maxMarginTop - (i + 1) * (lineHeight + msgHeight) + msgHeight / 2) {
                             if (z.strRemove(msgBox.style.marginTop) >= maxMarginTop - i * (lineHeight + msgHeight)) {
                                 if (z.strRemove(msgBox.style.marginTop) - marginMove <= maxMarginTop - i * (lineHeight + msgHeight)) {
@@ -345,25 +481,26 @@ class TSelect {
                     }
                 }
             };
-            //增加选项信息
-            addMsg = (value) => {
+            // 增加选项信息
+            addMsg = (code) => {
+                console.log(values);
                 return z.addElementByArray([
                     'div',
-                    'innerHTML',value + e.suffix,
+                    'innerHTML', getFullValue(code),
                     'style',[
-                        'margin-top',e.line.height + 'vh',
-                        'width','100%',
-                        'height',msgHeight + 'vh',
-                        'color',e.font.color,
-                        'text-align','center',
-                        'font-size',z.getFontSize(msgHeight / 2 * e.font.size),
-                        'line-height',msgHeight + 'vh'
+                        'margin-top', e.line.height + 'vh',
+                        'width', '100%',
+                        'height', msgHeight + 'vh',
+                        'color', e.font.color,
+                        'text-align', 'center',
+                        'font-size', z.getFontSize(msgHeight / 2 * e.font.size),
+                        'line-height', msgHeight + 'vh'
                     ]
                 ]);
             };
-            //选项信息
+            // 选项信息
             for (let i in values) {
-                msgBox.appendChild(msg[i] = addMsg(values[i]));
+                msgBox.appendChild(msg[i] = addMsg(i));
             }
         }
         if (navigator.userAgent.toUpperCase().includes('Firefox'.toUpperCase())) {
@@ -374,100 +511,12 @@ class TSelect {
             setTSelect();
         }
     }
-    //版本信息
+    // 版本信息
     get version() {
         return '1.0.0';
     }
-    //作者信息
+    // 作者信息
     get author() {
         return 'zdj0123';
-    }
-    //检查是否为空
-    get isEmpty() {
-        return this.number == 0;
-    }
-    //检查选中的选项是否改变
-    get _changeCheck() {
-        return function() {
-            !(this.value == this.lastValue) ? this._valueChangeFunction() : 0;
-        };
-    }
-    //在指定位置增加选项
-    get addValue() {
-        return function(value,code) {
-            if (this.checkValue((value = String(value))) < 0) {
-                if (code >= 0 && code <= this.number) {
-                    const newMsg = (this._addMsg)(value);
-                    let i = this.number - 1;
-                    while (i >= code) {
-                        this.values[i + 1] = this.values[i--];
-                    }
-                    this.values[code] = value;
-                    code < this.number - 1 ? this._msgBox.insertBefore(newMsg, this._msg[code]) : this._msgBox.appendChild(newMsg);
-                    this._msg.splice(code, 0, newMsg);
-                    this._minMarginTop = this._maxMarginTop - (this.number - 1) * (this.set.line.height + this._msgHeight);
-                    code <= this.code ? this.code++ : 0;
-                    this._msgBox.style.marginTop = this._msgBox.style.marginTop = this._maxMarginTop - this.code * (this.set.line.height + this._msgHeight) + 'vh';
-                } else {
-                    this.addValue(value, this.number);
-                }
-            }
-        }
-    }
-    //删除指定选项
-    get deleteValue() {
-        return function(code) {
-            if (code >= 0 && code < this.number) {
-                this.values[code] = null;
-                let i = code;
-                while (i < this.number) {
-                    this.values[i] = this.values[i++ + 1];
-                }
-                for (const i in this.values) {
-                    this.values[i] == null ? delete this.values[i] : 0;
-                }
-                this._msgBox.removeChild(this._msg[code]);
-                this._msg.splice(code,1);
-                this._minMarginTop = this._maxMarginTop - (this.number - 1) * (this.set.line.height + this._msgHeight);
-                this.code = this.isEmpty ? 0 : (this.code == this.number || this.code > code ? this.code-- : this.code);
-            } else {
-                this.number ? this.deleteValue(this.number - 1) : 0;
-            }
-        }
-    }
-    //清空所有选项
-    get clearValues() {
-        return function() {
-            while (this.number) {
-                this.deleteValue();
-            }
-        }
-    }
-    //修改指定选项
-    get changeValue() {
-        return function(code,value) {
-            if (code >= 0 && code < this.number && this.checkValue(value) < 0) {
-                this._msg[code].innerHTML = (this.values[code] = value) + this.set.suffix;
-                this._changeCheck();
-            }
-        }
-    }
-    //检查选项是否存在
-    get checkValue() {
-        return function(value) {
-            let result = -1;
-            for (const i in this.values) {
-                if (this.values[i] === String(value)) {
-                    return Number(i);
-                }
-            }
-            return result;
-        }
-    }
-    //设置值更改时执行的函数
-    get setValueChangeFunction() {
-        return function(Function) {
-            this._valueChangeFunction = Function;
-        }
     }
 }

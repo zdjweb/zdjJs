@@ -14,26 +14,7 @@ class TSelect {
             // 检查values属性是否存在 如果不存在则将其设为空数组
             e.values == null ? e.values = [] : (() => {
                 // 如果存在则检查values属性是否是数组 如果是数组则进行复制
-                Array.isArray(e.values) ? e.values = [...e.values] : (() => {
-                    const limit = e.values.split('~');
-                    limit[2] = limit[0] = +limit[0];
-                    limit[1] = +limit[1].split('+=')[0];
-                    if (limit[0] > limit[1]) {
-                        limit[0] = limit[1] - limit[0];
-                        limit[1] = limit[1] - limit[0];
-                        limit[0] = limit[0] + limit[1];
-                    }
-                    const plus = +e.values.split('+=')[1].split('%')[0];
-                    const number = e.values.split('==');
-                    number[0] = +number[0].split('%')[1];
-                    number[1] = +number[1];
-                    e.values = [];
-                    for (let i = limit[2]; i >= limit[0] && i <= limit[1]; i += plus) {
-                        if (i % number[0] == number[1]) {
-                            e.values.push(i);
-                        }
-                    }
-                })();
+                Array.isArray(e.values) ? e.values = [...e.values] : 0;
             })();
             // 检查prefix属性是否存在 如果不存在则将其设为空字符串 如果存在则需保证是字符串
             e.prefix = e.prefix == null ? '' : String(e.prefix);
@@ -67,6 +48,8 @@ class TSelect {
             })();
             // 检查font属性是否存在color属性 如果不存在则将其设为'#807F7F' 如果存在则需保证是字符串
             e.font.color = e.font.color == null ? '#807F7F' : String(e.font.color);
+            // 检查font属性是否存在opacityChange属性 如果不存在则将其设为true 如果存在则需保证其是布尔类型
+            e.font.opacityChange = e.font.opacityChange == null ? true : !!e.font.opacityChange;
             // 检查line属性是否存在 如果不存在则将其设为空对象
             e.line == null ? e.line = {} : e.line = {...e.line};
             // 检查line属性是否存在height属性 如果不存在则将其设为1
@@ -225,7 +208,10 @@ class TSelect {
             },
             // 检查选中的选项是否改变
             _changeCheck: {
-                get: () => () => !(this.value == this.lastValue) ? this.valueChangeFunction() : 0
+                get: () => () => this.value == this.lastValue ? 0 : (() => {
+                    this.valueChangeFunction();
+                    e.font.opacityChange ? msgBoxOpacityReSet(this.code) : 0;
+                })()
             },
             // 在指定位置增加选项
             addValue: {
@@ -242,39 +228,42 @@ class TSelect {
                             msg.splice(code, 0, newMsg);
                             minMarginTop = maxMarginTop - (this.number - 1) * (e.line.height + msgHeight);
                             this.code = this.number == 1 ? 0 : (code <= this.code ? ++this.code : this.code);
+                            return true;
                         } else {
-                            this.addValue(value, this.number);
+                            return this.addValue(value, this.number);
                         }
                     }
+                    return false;
                 }
             },
             // 删除指定选项
             deleteValue: {
                 get: () => function(code) {
                     if (code >= 0 && code < this.number) {
-                        values[code] = null;
                         let i = code;
                         while (i < this.number) {
                             values[i] = values[i++ + 1];
                         }
-                        for (const i in values) {
-                            values[i] == null ? delete values[i] : 0;
-                        }
+                        delete values[this.number];
                         msgBox.removeChild(msg[code]);
                         msg.splice(code,1);
                         minMarginTop = maxMarginTop - (this.number - 1) * (e.line.height + msgHeight);
                         this.code = this.isEmpty ? 0 : (this.code == this.number || this.code > code ? --this.code : this.code);
+                        return true;
                     } else {
-                        this.number ? this.deleteValue(this.number - 1) : 0;
+                        return this.number ? this.deleteValue(this.number - 1) : false;
                     }
                 }
             },
             // 清空所有选项
             clearValues: {
                 get: () => function() {
-                    while (this.number) {
-                        this.deleteValue();
-                    }
+                    return this.number ? (() => {
+                        while (this.number) {
+                            this.deleteValue();
+                        }
+                        return true;
+                    })() : false;
                 }
             },
             // 修改指定选项
@@ -283,7 +272,9 @@ class TSelect {
                     if (code >= 0 && code < this.number && this.checkValue(value) < 0) {
                         msg[code].innerHTML = prefix + (values[code] = String(value)) + suffix;
                         this._changeCheck();
+                        return true;
                     }
+                    return false;
                 }
             },
             // 检查选项是否存在
@@ -338,6 +329,8 @@ class TSelect {
             }
             return false;
         };
+        // 选项信息透明度更新
+        let msgBoxOpacityReSet;
         // 获取窗口并更新容器
         const w = container = container.contentWindow;
         // 给窗口绑定移出判断事件
@@ -366,6 +359,24 @@ class TSelect {
             z.getFontTimes(container);
             // 设置字体大小单位
             z.setFontSuffix('vh');
+            // 刚才所在位置的选项的编号
+            let moveCode = 0;
+            // 获取当前所在位置的选项的编号
+            const msgCodeGet = () => {
+                // 用于计算的选择线高度
+                const lineHeight = e.line.height;
+                if (z.strRemove(msgBox.style.marginTop) >= maxMarginTop - (lineHeight + msgHeight / 2)) {
+                    return 0;
+                } else if (z.strRemove(msgBox.style.marginTop) <= minMarginTop + msgHeight / 2) {
+                    return this.number - 1;
+                } else {
+                    for (let i = 1; i < this.number - 1; i++) {
+                        if (z.strRemove(msgBox.style.marginTop) <= maxMarginTop - i * (lineHeight + msgHeight) + msgHeight / 2 && z.strRemove(msgBox.style.marginTop) >= maxMarginTop - (i + 1) * (lineHeight + msgHeight) + msgHeight / 2) {
+                            return i;
+                        }
+                    }
+                }
+            };
             // 样式修正定时器
             let timer;
             // 刚刚移动的距离
@@ -400,6 +411,12 @@ class TSelect {
                     } else {
                         msgBox.style.marginTop = setMargin + 'vh';
                     }
+                    // 获取当前所在位置的选项的编号
+                    const nowMoveCode = msgCodeGet();
+                    // 判断当前和刚才所在位置的选项的编号是否相等
+                    moveCode == nowMoveCode ? 0 : (() => {
+                        e.font.opacityChange ? msgBoxOpacityReSet(moveCode = nowMoveCode) : 0;
+                    })();
                 }
             };
             // 结束事件
@@ -456,46 +473,48 @@ class TSelect {
                     'width', '100%'
                 ]
             ], container);
+            // 选项信息透明度更新
+            msgBoxOpacityReSet = (code) => {
+                for (let i in values) {
+                    msg[i].style.opacity = (1 - (0.5 / Math.floor((e.number - 1) / 2)) * Math.abs(i - code)).toFixed(2);
+                }
+            };
             // 选项信息容器重设已经选择选项更新
             const msgBoxReSet = () => {
                 // 用于计算的选择线高度
                 const lineHeight = e.line.height;
                 // 一次移动的距离
                 const marginMove = (lineHeight + msgHeight) / 50;
-                if (z.strRemove(msgBox.style.marginTop) >= maxMarginTop - (lineHeight + msgHeight / 2)) {
+                // 需要的选项的编号
+                const needCode = msgCodeGet();
+                if (needCode == 0) {
                     if (z.strRemove(msgBox.style.marginTop) + marginMove >= maxMarginTop) {
                         this.code = 0;
                         clearInterval(timer);
                     } else {
                         msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) + marginMove + 'vh';
                     }
-                } else if (z.strRemove(msgBox.style.marginTop) <= minMarginTop + msgHeight / 2) {
+                } else if (needCode == this.number - 1) {
                     if (z.strRemove(msgBox.style.marginTop) - marginMove <= minMarginTop) {
-                        this.code = this.number - 1;
+                        this.code = this.needCode;
                         clearInterval(timer);
                     } else {
                         msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) - marginMove + 'vh';
                     }
                 } else {
-                    for (let i = 1; i < this.number - 1; i++) {
-                        if (z.strRemove(msgBox.style.marginTop) <= maxMarginTop - i * (lineHeight + msgHeight) + msgHeight / 2 && z.strRemove(msgBox.style.marginTop) >= maxMarginTop - (i + 1) * (lineHeight + msgHeight) + msgHeight / 2) {
-                            if (z.strRemove(msgBox.style.marginTop) >= maxMarginTop - i * (lineHeight + msgHeight)) {
-                                if (z.strRemove(msgBox.style.marginTop) - marginMove <= maxMarginTop - i * (lineHeight + msgHeight)) {
-                                    this.code = i;
-                                    clearInterval(timer);
-                                    break;
-                                } else {
-                                    msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) - marginMove + 'vh';
-                                }
-                            } else {
-                                if (z.strRemove(msgBox.style.marginTop) + marginMove >= maxMarginTop - i * (lineHeight + msgHeight)) {
-                                    this.code = i;
-                                    clearInterval(timer);
-                                    break;
-                                } else {
-                                    msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) + marginMove + 'vh';
-                                }
-                            }
+                    if (z.strRemove(msgBox.style.marginTop) >= maxMarginTop - needCode * (lineHeight + msgHeight)) {
+                        if (z.strRemove(msgBox.style.marginTop) - marginMove <= maxMarginTop - needCode * (lineHeight + msgHeight)) {
+                            this.code = this.needCode;
+                            clearInterval(timer);
+                        } else {
+                            msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) - marginMove + 'vh';
+                        }
+                    } else {
+                        if (z.strRemove(msgBox.style.marginTop) + marginMove >= maxMarginTop - needCode * (lineHeight + msgHeight)) {
+                            this.code = this.needCode;
+                            clearInterval(timer);
+                        } else {
+                            msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) + marginMove + 'vh';
                         }
                     }
                 }
@@ -520,6 +539,7 @@ class TSelect {
             for (let i in values) {
                 msgBox.appendChild(msg[i] = addMsg(i));
             }
+            e.font.opacityChange ? msgBoxOpacityReSet(code) : 0;
         }
         if (navigator.userAgent.toUpperCase().includes('Firefox'.toUpperCase())) {
             container.addEventListener('load', () => {

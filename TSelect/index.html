@@ -19,18 +19,28 @@
     <script>
         const ts = new TSelect({
             container: document.body,
-            values: `-1~1+=1%1==0`,
+            values: (() => {
+                const arr = [];
+                for (let i = 0;i < 100; i++){
+                    arr[i] = i;
+                }
+                return arr;
+            })(),
             prefix: '第',
             suffix: '个',
             number: 5,
             background: '#FFFFFF',
             font: {
                 size: 1,
-                color: '#807F7F'
+                color: '#807F7F',
+                opacityChange: true
             },
             line: {
                 height: 1,
                 background: '#EEEEEE'
+            },
+            moveChangeFunction: function() {
+
             },
             valueChangeFunction: function() {
                 console.log(6);

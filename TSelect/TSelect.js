@@ -426,6 +426,13 @@ class TSelect {
                         msgBox.style.marginTop = setMargin + 'vh';
                     }
                     msgBoxOpacityMoveReSet();
+                    const nowMoveCode = msgCodeGet();
+                    moveCode == nowMoveCode ? 0 : (() => {
+                        const music = new Audio;
+                        music.src = 'TSelect.mp3';
+                        music.play();
+                        moveCode = nowMoveCode;
+                    })();
                 }
             };
             // 结束事件

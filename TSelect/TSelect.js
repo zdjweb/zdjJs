@@ -37,19 +37,41 @@ class TSelect {
             e.font == null ? e.font = {} : e.font = {...e.font};
             // 检查font属性是否存在size属性 如果不存在则将其设为1
             e.font.size == null ? e.font.size = 1 : (() => {
-                // 如果存在则需保证是数值类型 如果不是则将其设为1
-                typeof (e.font.size = parseFloat(e.font.size)) == 'number' && !isNaN(e.font.size) ? (() => {
-                    // 如果是则需保证其不小于0.3
-                    e.font.size < 0.3 ? e.font.size = 0.3 : (() => {
-                        // 如果不小于0.3则需保证其不大于1.25
-                        e.font.size > 1.25 ? e.font.size = 1.25 : 0;
-                    })();
-                })() : e.font.size = 1;
+                // 如果存在则需保证是数值类型
+                e.font.size = +e.font.size;
+                // 保证其值不小于0.3且不大于1.25且不是NaN
+                e.font.size < 0.3 ? e.font.size = 0.3 : (() => {
+                    e.font.size > 1.25 || isNaN(e.font.size) ? e.font.size = 1.25 : 0;
+                })();
             })();
             // 检查font属性是否存在color属性 如果不存在则将其设为'#807F7F' 如果存在则需保证是字符串
             e.font.color = e.font.color == null ? '#807F7F' : String(e.font.color);
-            // 检查font属性是否存在opacityChange属性 如果不存在则将其设为true 如果存在则需保证其是布尔类型
-            e.font.opacityChange = e.font.opacityChange == null ? true : !!e.font.opacityChange;
+            // 检查opacity属性是否存在change属性 如果不存在则将其设为true 如果存在则需保证其是布尔类型
+            e.opacity.change = e.opacity.change == null ? true : !!e.opacity.change;
+            // 检查opacity属性是否存在max属性 如果不存在则将其设为1
+            e.opacity.max == null ? e.opacity.max = 1 : (() => {
+                // 如果存在则需保证是数值类型
+                e.opacity.max = +e.opacity.max;
+                // 保证其值不小于0且不大于1且不是NaN
+                e.opacity.max < 0 ? e.opacity.max = 0 : (() => {
+                    e.opacity.max > 1 || isNaN(e.opacity.max) ? e.opacity.max = 1 : 0;
+                })();
+            })();
+            // 检查opacity属性是否存在min属性 如果不存在则将其设为0.2
+            e.opacity.min == null ? e.opacity.min = 0.2 : (() => {
+                // 如果存在则需保证是数值类型
+                e.opacity.min = +e.opacity.min;
+                // 保证其值不小于0且不大于1且不是NaN
+                e.opacity.min < 0 ? e.opacity.min = 0 : (() => {
+                    e.opacity.min > 1 || isNaN(e.opacity.min) ? e.opacity.min = 1 : 0;
+                })();
+            })();
+            // 如果opacity属性的min属性大于max属性则兑换值
+            e.opacity.min > e.opacity.max ? (() => {
+                e.opacity.min = e.opacity.max - e.opacity.min;
+                e.opacity.max -= e.opacity.min;
+                e.opacity.min += e.opacity.max;
+            })() : 0;
             // 检查line属性是否存在 如果不存在则将其设为空对象
             e.line == null ? e.line = {} : e.line = {...e.line};
             // 检查line属性是否存在height属性 如果不存在则将其设为1
@@ -73,6 +95,8 @@ class TSelect {
         e = getNewE();
         // 当前选择选项的编号
         let code = 0;
+        // 所在位置的选项的编号
+        let moveCode = 0;
         // 选项值
         const values = {};
         // 前缀
@@ -97,6 +121,30 @@ class TSelect {
         let addMsg;
         // 值更改时执行的函数
         let valueChangeFunction = e.valueChangeFunction;
+        // 用于存放音效
+        const music = [];
+        // 播放音效
+        const musicPlay = () => {
+            let needMusic;
+            const createMusic = () => {
+                needMusic = new Audio;
+                needMusic.src = 'TSelect.mp3';
+                music.push(needMusic);
+            };
+            if (music.length > 0){
+                needMusic = null;
+                for (let i in music) {
+                    if (music[i].paused) {
+                        needMusic = music[i];
+                        break;
+                    }
+                }
+                needMusic == null ? createMusic() : 0;
+            } else {
+                createMusic();
+            }
+            needMusic.play();
+        }
         // 获取选项完整值
         const getFullValue = (code) => {
             return prefix + values[code] + suffix;
@@ -161,10 +209,15 @@ class TSelect {
                 set(sCode) {
                     if (sCode >= 0 && sCode < this.number || sCode == 0) {
                         msgBox.style.marginTop = maxMarginTop - (code = sCode) * (e.line.height + msgHeight) + 'vh';
-                        e.font.opacityChange ? msgBoxOpacityReSet(this.code) : 0;
+                        code != moveCode ? musicPlay() : 0;
+                        e.opacity.change ? msgBoxOpacityReSet(moveCode = code) : 0;
                         this._changeCheck();
                     }
                 }
+            },
+            // 所在位置的选项的编号
+            moveCode: {
+                get: () => moveCode
             },
             // 当前选择的选项值
             value: {
@@ -366,8 +419,6 @@ class TSelect {
             z.getFontTimes(container);
             // 设置字体大小单位
             z.setFontSuffix('vh');
-            // 刚才所在位置的选项的编号
-            let moveCode = 0;
             // 获取当前所在位置的选项的编号
             const msgCodeGet = () => {
                 // 用于计算的选择线高度
@@ -395,11 +446,9 @@ class TSelect {
                 max > this.number - 1 ? max = this.number - 1 : 0;
                 const moveTimes = +(-(z.strRemove(msgBox.style.marginTop) - (maxMarginTop - nowMoveCode * (e.line.height + msgHeight))) / (e.line.height + msgHeight)).toFixed(2);
                 for (let i = min; i <= max; i++) {
-                    msg[i].style.opacity = (1 - (0.5 / Math.floor((e.number - 1) / 2)) * (Math.abs(i - (nowMoveCode + moveTimes)))).toFixed(2);
+                    msg[i].style.opacity = (e.opacity.max - ((e.opacity.max - e.opacity.min) / Math.floor((e.number - 1) / 2)) * (Math.abs(i - (nowMoveCode + moveTimes)))).toFixed(2);
                 }
             };
-            // 用于播放音效
-            const music = [];
             // 样式修正定时器
             let timer;
             // 刚刚移动的距离
@@ -434,28 +483,10 @@ class TSelect {
                     } else {
                         msgBox.style.marginTop = setMargin + 'vh';
                     }
-                    msgBoxOpacityMoveReSet();
+                    e.opacity.change ? msgBoxOpacityMoveReSet() : 0;
                     const nowMoveCode = msgCodeGet();
                     moveCode == nowMoveCode ? 0 : (() => {
-                        let needMusic;
-                        const createMusic = () => {
-                            needMusic = new Audio;
-                            needMusic.src = 'TSelect.mp3';
-                            music.push(needMusic);
-                        };
-                        if (music.length > 0){
-                            needMusic = null;
-                            for (let i in music) {
-                                if (music[i].paused) {
-                                    needMusic = music[i];
-                                    break;
-                                }
-                            }
-                            needMusic == null ? createMusic() : 0;
-                        } else {
-                            createMusic();
-                        }
-                        needMusic.play();
+                        musicPlay();
                         moveCode = nowMoveCode;
                     })();
                 }
@@ -522,7 +553,7 @@ class TSelect {
                 let max = code + needNumber;
                 max > this.number - 1 ? max = this.number - 1 : 0;
                 for (let i = min; i <= max; i++) {
-                    msg[i].style.opacity = (1 - (0.5 / Math.floor((e.number - 1) / 2)) * Math.abs(i - code)).toFixed(2);
+                    msg[i].style.opacity = (e.opacity.max - ((e.opacity.max - e.opacity.min) / Math.floor((e.number - 1) / 2)) * Math.abs(i - code)).toFixed(2);
                 }
             };
             // 选项信息容器重设已经选择选项更新
@@ -588,7 +619,7 @@ class TSelect {
             for (let i in values) {
                 msgBox.appendChild(msg[i] = addMsg(i));
             }
-            e.font.opacityChange ? msgBoxOpacityReSet(code) : 0;
+            e.opacity.change ? msgBoxOpacityReSet(code) : 0;
         }
         if (navigator.userAgent.toUpperCase().includes('Firefox'.toUpperCase())) {
             container.addEventListener('load', () => {

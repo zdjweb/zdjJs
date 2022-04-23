@@ -391,6 +391,9 @@ class TSelect {
                     msg[i].style.opacity = (1 - (0.5 / Math.floor((e.number - 1) / 2)) * (Math.abs(i - (nowMoveCode + moveTimes)))).toFixed(2);
                 }
             };
+            // 用于播放音效
+            const music = new Audio;
+            music.src = 'TSelect.mp3';
             // 样式修正定时器
             let timer;
             // 刚刚移动的距离
@@ -428,8 +431,7 @@ class TSelect {
                     msgBoxOpacityMoveReSet();
                     const nowMoveCode = msgCodeGet();
                     moveCode == nowMoveCode ? 0 : (() => {
-                        const music = new Audio;
-                        music.src = 'TSelect.mp3';
+                        music.currentTime = 0;
                         music.play();
                         moveCode = nowMoveCode;
                     })();

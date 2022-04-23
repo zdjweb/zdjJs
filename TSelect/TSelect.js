@@ -343,6 +343,13 @@ class TSelect {
                 this.code++;
             }
         });
+        // 给窗口绑定鼠标滚轮事件
+        w.addEventListener('mousewheel',(event) => {
+            event.wheelDelta < 0 ? this.code++ : this.code--;
+        });
+        w.addEventListener('DOMMouseScroll', (event) => {
+            event.detail > 0 ? this.code++ : this.code--;
+        });
         // 设置TSelect主要部分
         const setTSelect = () => {
             // 更新容器并设置容器样式
@@ -392,8 +399,7 @@ class TSelect {
                 }
             };
             // 用于播放音效
-            const music = new Audio;
-            music.src = 'TSelect.mp3';
+            const music = [];
             // 样式修正定时器
             let timer;
             // 刚刚移动的距离
@@ -431,8 +437,25 @@ class TSelect {
                     msgBoxOpacityMoveReSet();
                     const nowMoveCode = msgCodeGet();
                     moveCode == nowMoveCode ? 0 : (() => {
-                        music.currentTime = 0;
-                        music.play();
+                        let needMusic;
+                        const createMusic = () => {
+                            needMusic = new Audio;
+                            needMusic.src = 'TSelect.mp3';
+                            music.push(needMusic);
+                        };
+                        if (music.length > 0){
+                            needMusic = null;
+                            for (let i in music) {
+                                if (music[i].paused) {
+                                    needMusic = music[i];
+                                    break;
+                                }
+                            }
+                            needMusic == null ? createMusic() : 0;
+                        } else {
+                            createMusic();
+                        }
+                        needMusic.play();
                         moveCode = nowMoveCode;
                     })();
                 }

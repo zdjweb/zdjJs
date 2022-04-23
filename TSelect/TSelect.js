@@ -161,6 +161,7 @@ class TSelect {
                 set(sCode) {
                     if (sCode >= 0 && sCode < this.number || sCode == 0) {
                         msgBox.style.marginTop = maxMarginTop - (code = sCode) * (e.line.height + msgHeight) + 'vh';
+                        e.font.opacityChange ? msgBoxOpacityReSet(this.code) : 0;
                         this._changeCheck();
                     }
                 }
@@ -210,7 +211,6 @@ class TSelect {
             _changeCheck: {
                 get: () => () => this.value == this.lastValue ? 0 : (() => {
                     this.valueChangeFunction();
-                    e.font.opacityChange ? msgBoxOpacityReSet(this.code) : 0;
                 })()
             },
             // 在指定位置增加选项
@@ -377,6 +377,20 @@ class TSelect {
                     }
                 }
             };
+            // 选项信息透明度移动更新
+            const msgBoxOpacityMoveReSet = () => {
+                // 获取当前所在位置的选项的编号
+                const nowMoveCode = msgCodeGet();
+                const needNumber = Math.floor((e.number - 1) / 2) + 1;
+                let min = nowMoveCode - needNumber;
+                min < 0 ? min = 0 : 0;
+                let max = nowMoveCode + needNumber;
+                max > this.number - 1 ? max = this.number - 1 : 0;
+                const moveTimes = +(-(z.strRemove(msgBox.style.marginTop) - (maxMarginTop - nowMoveCode * (e.line.height + msgHeight))) / (e.line.height + msgHeight)).toFixed(2);
+                for (let i = min; i <= max; i++) {
+                    msg[i].style.opacity = (1 - (0.5 / Math.floor((e.number - 1) / 2)) * (Math.abs(i - (nowMoveCode + moveTimes)))).toFixed(2);
+                }
+            };
             // 样式修正定时器
             let timer;
             // 刚刚移动的距离
@@ -411,12 +425,7 @@ class TSelect {
                     } else {
                         msgBox.style.marginTop = setMargin + 'vh';
                     }
-                    // 获取当前所在位置的选项的编号
-                    const nowMoveCode = msgCodeGet();
-                    // 判断当前和刚才所在位置的选项的编号是否相等
-                    moveCode == nowMoveCode ? 0 : (() => {
-                        e.font.opacityChange ? msgBoxOpacityReSet(moveCode = nowMoveCode) : 0;
-                    })();
+                    msgBoxOpacityMoveReSet();
                 }
             };
             // 结束事件
@@ -475,7 +484,12 @@ class TSelect {
             ], container);
             // 选项信息透明度更新
             msgBoxOpacityReSet = (code) => {
-                for (let i in values) {
+                const needNumber = Math.floor((e.number - 1) / 2) + 1;
+                let min = code - needNumber;
+                min < 0 ? min = 0 : 0;
+                let max = code + needNumber;
+                max > this.number - 1 ? max = this.number - 1 : 0;
+                for (let i = min; i <= max; i++) {
                     msg[i].style.opacity = (1 - (0.5 / Math.floor((e.number - 1) / 2)) * Math.abs(i - code)).toFixed(2);
                 }
             };
@@ -493,28 +507,31 @@ class TSelect {
                         clearInterval(timer);
                     } else {
                         msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) + marginMove + 'vh';
+                        msgBoxOpacityMoveReSet();
                     }
                 } else if (needCode == this.number - 1) {
                     if (z.strRemove(msgBox.style.marginTop) - marginMove <= minMarginTop) {
-                        this.code = this.needCode;
+                        this.code = needCode;
                         clearInterval(timer);
                     } else {
                         msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) - marginMove + 'vh';
+                        msgBoxOpacityMoveReSet();
                     }
                 } else {
                     if (z.strRemove(msgBox.style.marginTop) >= maxMarginTop - needCode * (lineHeight + msgHeight)) {
                         if (z.strRemove(msgBox.style.marginTop) - marginMove <= maxMarginTop - needCode * (lineHeight + msgHeight)) {
-                            this.code = this.needCode;
+                            this.code = needCode;
                             clearInterval(timer);
                         } else {
                             msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) - marginMove + 'vh';
                         }
                     } else {
                         if (z.strRemove(msgBox.style.marginTop) + marginMove >= maxMarginTop - needCode * (lineHeight + msgHeight)) {
-                            this.code = this.needCode;
+                            this.code = needCode;
                             clearInterval(timer);
                         } else {
                             msgBox.style.marginTop = z.strRemove(msgBox.style.marginTop) + marginMove + 'vh';
+                            msgBoxOpacityMoveReSet();
                         }
                     }
                 }

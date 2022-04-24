@@ -20,71 +20,42 @@ class TSelect {
             e.prefix = e.prefix == null ? '' : String(e.prefix);
             // 检查suffix属性是否存在 如果不存在则将其设为空字符串 如果存在则需保证是字符串
             e.suffix = e.suffix == null ? '' : String(e.suffix);
-            // 检查number属性是否存在 如果不存在则将其设为5
-            e.number == null ? e.number = 5 : (() => {
-                // 如果存在则需保证是数值类型并且是整数 如果不是则将其设为5
-                typeof (e.number = parseInt(e.number)) == 'number' && !isNaN(e.number) ? (() => {
-                    // 如果是则需保证其不小于1
-                    e.number < 1 ? e.number = 1 : (() => {
-                        // 如果不小于1则需保证其不大于15
-                        e.number > 15 ? e.number = 15 : 0;
-                    })();
-                })() : e.number = 5;
-            })();
+            const reSetValue = (value, min, max, def) => {
+                return (value == null || isNaN(value) ? def : (value < min ? min : (value > max ? max : +value)));
+            };
+            // 检查default属性是否存在 并保证其是整数 且不小于0、不大于选项的数量减一 默认值为0
+            e.default = parseInt(reSetValue(e.default, 0, e.values.toString().split(',').length - 1, 0));
+            console.log(e.default);
+            // 检查number属性是否存在 并保证其是整数 且不小于1、不大于15 默认值为5
+            e.number = parseInt(reSetValue(e.number, 1, 15, 5));
             // 检查background属性是否存在 如果不存在则将其设为'#FFFFFF' 如果存在则需保证是字符串
             e.background = e.background == null ? '#FFFFFF' : String(e.background);
             // 检查font属性是否存在 如果不存在则将其设为空对象 如果存在则进行复制
             e.font == null ? e.font = {} : e.font = {...e.font};
-            // 检查font属性是否存在size属性 如果不存在则将其设为1
-            e.font.size == null ? e.font.size = 1 : (() => {
-                // 如果存在则需保证是数值类型
-                e.font.size = +e.font.size;
-                // 保证其值不小于0.3且不大于1.25且不是NaN
-                e.font.size < 0.3 ? e.font.size = 0.3 : (() => {
-                    e.font.size > 1.25 || isNaN(e.font.size) ? e.font.size = 1.25 : 0;
-                })();
-            })();
+            // 检查font属性是否存在size属性 并保证其是数值类型 且不小于0.3、不大于1.25 默认值为1
+            e.font.size = reSetValue(e.font.size, 0.3, 1.25, 1);
             // 检查font属性是否存在color属性 如果不存在则将其设为'#807F7F' 如果存在则需保证是字符串
             e.font.color = e.font.color == null ? '#807F7F' : String(e.font.color);
+            // 检查opacity属性是否存在 如果不存在则将其设为空对象
+            e.opacity = e.opacity == null ? {} : {...e.opacity};
             // 检查opacity属性是否存在change属性 如果不存在则将其设为true 如果存在则需保证其是布尔类型
             e.opacity.change = e.opacity.change == null ? true : !!e.opacity.change;
-            // 检查opacity属性是否存在max属性 如果不存在则将其设为1
-            e.opacity.max == null ? e.opacity.max = 1 : (() => {
-                // 如果存在则需保证是数值类型
-                e.opacity.max = +e.opacity.max;
-                // 保证其值不小于0且不大于1且不是NaN
-                e.opacity.max < 0 ? e.opacity.max = 0 : (() => {
-                    e.opacity.max > 1 || isNaN(e.opacity.max) ? e.opacity.max = 1 : 0;
-                })();
-            })();
-            // 检查opacity属性是否存在min属性 如果不存在则将其设为0.2
-            e.opacity.min == null ? e.opacity.min = 0.2 : (() => {
-                // 如果存在则需保证是数值类型
-                e.opacity.min = +e.opacity.min;
-                // 保证其值不小于0且不大于1且不是NaN
-                e.opacity.min < 0 ? e.opacity.min = 0 : (() => {
-                    e.opacity.min > 1 || isNaN(e.opacity.min) ? e.opacity.min = 1 : 0;
-                })();
-            })();
-            // 如果opacity属性的min属性大于max属性则兑换值
+            // 检查opacity属性是否存在max属性 并保证其是数值类型 且不小于0、不大于1 默认值为1
+            e.opacity.max = reSetValue(e.opacity.max, 0, 1, 1);
+            // 检查opacity属性是否存在min属性 并保证其是数值类型 且不小于0、不大于1 默认值为0.2
+            e.opacity.min = reSetValue(e.opacity.min, 0, 1, 0.2);
+            // 如果opacity属性的min属性大于max属性则互换值
             e.opacity.min > e.opacity.max ? (() => {
                 e.opacity.min = e.opacity.max - e.opacity.min;
                 e.opacity.max -= e.opacity.min;
                 e.opacity.min += e.opacity.max;
             })() : 0;
+            // 检查opacity属性的max属性是否不小于0.2
+            e.opacity.max = reSetValue(e.opacity.max, 0.2, 1, 0.1);
             // 检查line属性是否存在 如果不存在则将其设为空对象
-            e.line == null ? e.line = {} : e.line = {...e.line};
-            // 检查line属性是否存在height属性 如果不存在则将其设为1
-            e.line.height == null ? e.line.height = 1 : (() => {
-                // 如果存在则需保证是数值类型 如果不是则将其设为1
-                typeof (e.line.height = parseFloat(e.line.height)) == 'number' && !isNaN(e.line.height) ? (() => {
-                    // 如果是则需保证其不小于0.5
-                    e.line.height < 0.5 ? e.line.height = 0.5 : (() => {
-                        // 如果不小于0.5则需保证其不大于1.25
-                        e.line.height > 1.25 ? e.line.height = 1.25 : 0;
-                    })();
-                })() : e.line.height = 1;
-            })();
+            e.line = e.line == null ? {} : {...e.line};
+            // 检查line属性是否存在height属性 并保证其是数值类型 且不小于0.5、不大于1.25 默认值为1
+            e.line.height = reSetValue(e.line.height, 0.5, 1.25, 1);
             // 检查line属性是否存在background属性 如果不存在则将其设为'#EEEEEE' 如果存在则需保证是字符串
             e.line.background = e.line.background == null ? '#EEEEEE' : String(e.line.background);
             // 检查valueChangeFunction属性是否存在 如果不存在则将其设为空函数 如果存在则进行复制
@@ -94,9 +65,9 @@ class TSelect {
         // 获取一个新的e
         e = getNewE();
         // 当前选择选项的编号
-        let code = 0;
+        let code = e.default;
         // 所在位置的选项的编号
-        let moveCode = 0;
+        let moveCode = code;
         // 选项值
         const values = {};
         // 前缀
@@ -353,7 +324,7 @@ class TSelect {
 
         }
         // 将lastValue的值初始化为第一个选项的值
-        lastValue = values[0];
+        lastValue = values[code];
         // 创建一个zdjJs对象
         const z = new zdjJs;
         // 创建容器
@@ -619,6 +590,7 @@ class TSelect {
             for (let i in values) {
                 msgBox.appendChild(msg[i] = addMsg(i));
             }
+            msgBox.style.marginTop = maxMarginTop - code * (e.line.height + msgHeight) + 'vh';
             e.opacity.change ? msgBoxOpacityReSet(code) : 0;
         }
         if (navigator.userAgent.toUpperCase().includes('Firefox'.toUpperCase())) {

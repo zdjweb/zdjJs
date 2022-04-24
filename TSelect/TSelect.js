@@ -580,6 +580,7 @@ class TSelect {
                         'width', '100%',
                         'height', msgHeight + 'vh',
                         'color', e.font.color,
+                        'white-space','nowrap',
                         'text-align', 'center',
                         'font-size', z.getFontSize(msgHeight / 2 * e.font.size),
                         'line-height', msgHeight + 'vh'

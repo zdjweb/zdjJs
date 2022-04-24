@@ -19,13 +19,7 @@
     <script>
         const ts = new TSelect({
             container: document.body,
-            values: (() => {
-                const arr = [];
-                for (let i = 0;i < 10; i++){
-                    arr[i] = i;
-                }
-                return arr;
-            })(),
+            values: [1, 2, 3, 4, 5, 5, 6],
             prefix: '这是超级长的第',
             suffix: '个选项',
             default: 5,

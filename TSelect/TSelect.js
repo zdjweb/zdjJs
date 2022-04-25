@@ -78,12 +78,10 @@ class TSelect {
         const values = {};
         // 前缀 后缀
         let prefix = e.prefix, suffix = e.suffix;
-        // 当前选择的选项的编号 当前所在位置的选项的编号
-        let code = e.default, moveCode = code;
-        // 刚刚选中的选项值
-        let lastValue;
+        // 当前选择的选项的编号 刚刚选择的选项的编号 当前所在位置的选项的编号
+        let code = e.default, lastCode = code, moveCode = code;
         // 选项改变的方向
-        let direction = 1;
+        let direction = 0;
         // 选项容器 选项 选择线
         let msgBox, msg = [], line = [];
         // 选项信息高度 最大marginTop 最小marginTop
@@ -205,17 +203,24 @@ class TSelect {
                     return number;
                 }
             },
-            // 当前选择选项的编号
+            // 当前选择的选项的编号
             code: {
                 get: () => code,
                 set(sCode) {
                     if (sCode >= 0 && sCode < this.number || sCode == 0) {
+                        lastCode = code;
                         msgBox.style.marginTop = maxMarginTop - (code = sCode) * (e.line.height + msgHeight) + 'vh';
+                        direction = lastCode < code ? 1 : (lastCode > code ? -1 : 0);
                         code != moveCode ? audioPlay() : 0;
-                        e.opacity.change ? opacityReSet(moveCode = code) : 0;
+                        moveCode = code;
+                        e.opacity.change ? opacityReSet(code) : 0;
                         this._changeCheck();
                     }
                 }
+            },
+            // 刚刚选择的选项的编号
+            lastCode: {
+                get: () => lastCode
             },
             // 所在位置的选项的编号
             moveCode: {
@@ -236,20 +241,11 @@ class TSelect {
             },
             // 刚刚选择的选项的值
             lastValue: {
-                get() {
-                    const value = lastValue;
-                    lastValue = this.value;
-                    if (this.checkValue(value) < this.checkValue(lastValue)) {
-                        direction = 1;
-                    } else if (this.checkValue(value) > this.checkValue(lastValue)) {
-                        direction = -1;
-                    }
-                    return value;
-                }
+                get: () => lastCode == null ? undefined : values[lastCode]
             },
             // 刚刚选择的选项的完整值
             lastFullValue: {
-                get: () => this.isEmpty ? undefined : getFullValue(code)
+                get: () => this.isEmpty ? undefined : getFullValue(lastCode)
             },
             // 选项改变的方向
             direction: {
@@ -268,7 +264,7 @@ class TSelect {
             },
             // 检查选中的选项是否改变
             _changeCheck: {
-                get: () => () => this.value == this.lastValue ? 0 : (() => {
+                get: () => () => code == lastCode ? 0 : (() => {
                     this.valueChangeFunction();
                 })()
             },
@@ -355,8 +351,6 @@ class TSelect {
                 this.checkValue(e.values[i]) < 0 ? values[this.number] = e.values[i] : 0;
             }
         })() : 0;
-        // 将lastValue的值初始化为第一个选项的值
-        lastValue = values[code];
         // 创建一个zdjJs对象
         const z = new zdjJs;
         // 创建容器

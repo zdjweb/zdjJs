@@ -21,8 +21,8 @@
             container: document.body,
             values: (() => {
                 const arr = [];
-                for (let i = 0; i < 50; i++) {
-                    arr.push(i);
+                for (let i = 0; i < 30; i++) {
+                    arr.push(i + 1);
                 }
                 arr.push(5);
                 return arr;
@@ -43,7 +43,7 @@
             },
             line: {
                 height: 1,
-                background: '#EEEEEE'
+                color: '#EEEEEE'
             },
             moveFunction: function() {
 
@@ -52,13 +52,16 @@
 
             },
             valueChangeFunction: function() {
-                if (this.code == 15) {
+                if (this.code < 15) {
+                    this.background = '#FFFFFF';
+                    this.lineColor = '#EEEEEE';
+                    this.showNumber = 5;
+                } else {
+                    this.background = '#000000';
+                    this.lineColor = '#111111';
                     this.showNumber = 7;
-                } else if (this.code == 30) {
-                    this.showNumber = 11;
-                } else if (this.code == 40) {
-                    this.showNumber = 15;
                 }
+                console.log(6);
             }
         });
     </script>

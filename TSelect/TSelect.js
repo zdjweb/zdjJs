@@ -60,8 +60,8 @@ class TSelect {
             e.line = e.line == null ? {} : {...e.line};
             // 检查line属性是否存在height属性 并保证其是数值类型 且不小于0.5、不大于1.25 默认值为1
             e.line.height = reSetValue(e.line.height, 0.5, 1.25, 1);
-            // 检查line属性是否存在background属性 不存在则将其设为'#EEEEEE' 存在则需保证是字符串
-            e.line.background = e.line.background == null ? '#EEEEEE' : String(e.line.background);
+            // 检查line属性是否存在color属性 不存在则将其设为'#EEEEEE' 存在则需保证是字符串
+            e.line.color = e.line.color == null ? '#EEEEEE' : String(e.line.color);
             // 检查valueChangeFunction属性是否存在 不存在则将其设为空函数 存在则进行复制
             e.valueChangeFunction = e.valueChangeFunction == null ? () => {} : eval(`(${e.valueChangeFunction})`);
             return e;
@@ -74,6 +74,8 @@ class TSelect {
         let number = e.number;
         // 背景颜色
         let background = e.background;
+        // 选择线颜色
+        let lineColor = e.line.color;
         // 选项值
         const values = {};
         // 前缀 后缀
@@ -143,7 +145,8 @@ class TSelect {
                     for (const i in line) {
                         line[i].style.top = maxMarginTop + (msgHeight + e.line.height) * i + 'vh';
                     }
-                    this.code = code;
+                    msgBox.style.marginTop = maxMarginTop - code * (e.line.height + msgHeight) + 'vh';
+                    e.opacity.change ? opacityReSet(code) : 0;
                 }
             },
             // 背景颜色
@@ -151,6 +154,15 @@ class TSelect {
                 get: () => background,
                 set(sBackground) {
                     body.style.background = background = sBackground;
+                }
+            },
+            // 选择线颜色
+            lineColor: {
+                get: () => lineColor,
+                set(sLineColor) {
+                    for (const i in line) {
+                        line[i].style.background = sLineColor;
+                    }
                 }
             },
             // 选项值
@@ -528,7 +540,7 @@ class TSelect {
                         'margin', '',
                         'width', '100%',
                         'height', e.line.height + '%',
-                        'background', e.line.background
+                        'background', lineColor
                     ]
                 ], container);
             }

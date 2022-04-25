@@ -6,6 +6,10 @@ class TSelect {
         if (e.container == null) {
             return;
         }
+        // 进行条件判断 验证一个值是否符合条件 并返回符合条件的值
+        const reSetValue = (value, min, max, def) => {
+            return (value == null || isNaN(value) ? def : (value < min ? min : (value > max ? max : +value)));
+        };
         // 创建一个新的e
         const getNewE = () => {
             // 对原有的e进行复制
@@ -24,10 +28,6 @@ class TSelect {
             e.prefix = e.prefix == null ? '' : String(e.prefix);
             // 检查suffix属性是否存在 不存在则将其设为空字符串 存在则需保证是字符串
             e.suffix = e.suffix == null ? '' : String(e.suffix);
-            // 进行条件判断 验证一个值是否符合条件 并返回符合条件的值
-            const reSetValue = (value, min, max, def) => {
-                return (value == null || isNaN(value) ? def : (value < min ? min : (value > max ? max : +value)));
-            };
             // 检查default属性是否存在 并保证其是整数 且不小于0、不大于选项的数量减一 默认值为0
             e.default = parseInt(reSetValue(e.default, 0, e.values.toString().split(',').length - 1, 0));
             // 检查number属性是否存在 并保证其是整数 且不小于1、不大于15 默认值为5
@@ -68,22 +68,35 @@ class TSelect {
         };
         // 获取一个新的e
         e = getNewE();
-        // 当前选择的选项的编号 当前所在位置的选项的编号
-        let code = e.default, moveCode = code;
+        // TSelect页面的body
+        let body;
+        // 显示的选项个数
+        let number = e.number;
+        // 背景颜色
+        let background = e.background;
         // 选项值
         const values = {};
         // 前缀 后缀
         let prefix = e.prefix, suffix = e.suffix;
+        // 当前选择的选项的编号 当前所在位置的选项的编号
+        let code = e.default, moveCode = code;
         // 刚刚选中的选项值
         let lastValue;
         // 选项改变的方向
         let direction = 1;
-        // 选项信息容器 选项信息
-        let msgBox, msg = [];
-        // 选项信息高度
-        let msgHeight;
-        // 最大marginTop 最小marginTop
-        let maxMarginTop, minMarginTop;
+        // 选项容器 选项 选择线
+        let msgBox, msg = [], line = [];
+        // 选项信息高度 最大marginTop 最小marginTop
+        let msgHeight, maxMarginTop, minMarginTop;
+        // 获取选项部分相关样式
+        const getStyle = () => {
+            // 选项信息高度
+            msgHeight = (100 - (number - 1) * e.line.height) / number;
+            // 最大marginTop
+            maxMarginTop = msgHeight * parseInt(number / 2) + e.line.height * (parseInt(number / 2) - 1);
+            // 最小marginTop
+            minMarginTop = maxMarginTop - (this.number - 1) * (e.line.height + msgHeight);
+        };
         // 用于增加选项信息的函数
         let addMsg = () => {};
         // 选择的值改变时执行的函数
@@ -116,6 +129,31 @@ class TSelect {
             // 设置信息
             set: {
                 get: () => getNewE()
+            },
+            // 显示的选项个数
+            showNumber: {
+                get: () => number,
+                set(sNumber) {
+                    getStyle(number = parseInt(reSetValue(sNumber, 1, 15, 5)));
+                    for (const i in msg) {
+                        Object.assign(msg[i].style, {
+                            height: msgHeight + 'vh',
+                            fontSize: z.getFontSize(msgHeight / 2 * e.font.size),
+                            lineHeight: msgHeight + 'vh'
+                        });
+                    }
+                    for (const i in line) {
+                        line[i].style.top = maxMarginTop + (msgHeight + e.line.height) * i + 'vh';
+                    }
+                    this.code = code;
+                }
+            },
+            // 背景颜色
+            background: {
+                get: () => background,
+                set(sBackground) {
+                    body.style.background = background = sBackground;
+                }
             },
             // 选项值
             values: {
@@ -183,7 +221,7 @@ class TSelect {
             moveCode: {
                 get: () => moveCode
             },
-            // 当前选择的选项值
+            // 当前选择的选项的值
             value: {
                 get: () => values[code],
                 set(value) {
@@ -192,11 +230,11 @@ class TSelect {
                     }
                 }
             },
-            // 当前选择的完整选项值
+            // 当前选择的选项的完整值
             fullValue: {
                 get: () => this.isEmpty ? undefined : getFullValue(code)
             },
-            // 刚刚选中的选项值
+            // 刚刚选择的选项的值
             lastValue: {
                 get() {
                     const value = lastValue;
@@ -208,6 +246,10 @@ class TSelect {
                     }
                     return value;
                 }
+            },
+            // 刚刚选择的选项的完整值
+            lastFullValue: {
+                get: () => this.isEmpty ? undefined : getFullValue(code)
             },
             // 选项改变的方向
             direction: {
@@ -367,12 +409,12 @@ class TSelect {
         // 设置TSelect主要部分
         const setTSelect = () => {
             // 更新容器并设置容器样式
-            Object.assign((container = container.document.body).style, {
+            Object.assign((body = container = container.document.body).style, {
                 margin: 0,
                 padding: 0,
                 width: '100vw',
                 height: '100vh',
-                background: e.background,
+                background: background,
                 fontSize: 0,
                 overflow: 'hidden'
             });
@@ -404,14 +446,14 @@ class TSelect {
             const opacityMoveReSet = () => {
                 // 获取当前所在位置的选项的编号
                 const nowMoveCode = moveCodeGet();
-                const needNumber = Math.floor((e.number - 1) / 2) + 1;
+                const needNumber = Math.floor((number - 1) / 2) + 1;
                 let min = nowMoveCode - needNumber;
                 min < 0 ? min = 0 : 0;
                 let max = nowMoveCode + needNumber;
                 max > this.number - 1 ? max = this.number - 1 : 0;
                 const moveTimes = +(-(z.strRemove(msgBox.style.marginTop) - (maxMarginTop - nowMoveCode * (e.line.height + msgHeight))) / (e.line.height + msgHeight)).toFixed(2);
                 for (let i = min; i <= max; i++) {
-                    msg[i].style.opacity = (e.opacity.max - ((e.opacity.max - e.opacity.min) / Math.floor((e.number - 1) / 2)) * (Math.abs(i - (nowMoveCode + moveTimes)))).toFixed(2);
+                    msg[i].style.opacity = (e.opacity.max - ((e.opacity.max - e.opacity.min) / Math.floor((number - 1) / 2)) * (Math.abs(i - (nowMoveCode + moveTimes)))).toFixed(2);
                 }
             };
             // 样式修正定时器
@@ -479,15 +521,10 @@ class TSelect {
                     'mouseup', end
                 ]
             ], container);
-            // 选项信息高度
-            msgHeight = (100 - (e.number - 1) * e.line.height) / e.number;
-            // 最大marginTop
-            maxMarginTop = msgHeight * parseInt(e.number / 2) + e.line.height * (parseInt(e.number / 2) - 1);
-            // 最小marginTop
-            minMarginTop = maxMarginTop - (this.number - 1) * (e.line.height + msgHeight);
+            getStyle();
             // 选择线
             for (let i = 0; i < 2; i++) {
-                z.addElementByArray([
+                line[i] = z.addElementByArray([
                     'div',
                     'style', [
                         'position', 'fixed',
@@ -512,13 +549,13 @@ class TSelect {
             ], container);
             // 选项信息透明度更新
             opacityReSet = (code) => {
-                const needNumber = Math.floor((e.number - 1) / 2) + 1;
+                const needNumber = Math.floor((number - 1) / 2) + 1;
                 let min = code - needNumber;
                 min < 0 ? min = 0 : 0;
                 let max = code + needNumber;
                 max > this.number - 1 ? max = this.number - 1 : 0;
                 for (let i = min; i <= max; i++) {
-                    msg[i].style.opacity = (e.opacity.max - ((e.opacity.max - e.opacity.min) / Math.floor((e.number - 1) / 2)) * Math.abs(i - code)).toFixed(2);
+                    msg[i].style.opacity = (e.opacity.max - ((e.opacity.max - e.opacity.min) / Math.floor((number - 1) / 2)) * Math.abs(i - code)).toFixed(2);
                 }
             };
             // 选项信息容器重设已经选择选项更新

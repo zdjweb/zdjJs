@@ -19,7 +19,14 @@
     <script>
         const ts = new TSelect({
             container: document.body,
-            values: [1, 2, 3, 4, 5, 5, 6],
+            values: (() => {
+                const arr = [];
+                for (let i = 0; i < 50; i++) {
+                    arr.push(i);
+                }
+                arr.push(5);
+                return arr;
+            })(),
             prefix: '这是超级长的第',
             suffix: '个选项',
             default: 5,
@@ -45,7 +52,13 @@
 
             },
             valueChangeFunction: function() {
-                console.log(this.fullValue);
+                if (this.code == 15) {
+                    this.showNumber = 7;
+                } else if (this.code == 30) {
+                    this.showNumber = 11;
+                } else if (this.code == 40) {
+                    this.showNumber = 15;
+                }
             }
         });
     </script>

@@ -3,10 +3,10 @@ class TSelect {
     // 构造函数
     constructor(e) {
         // 检查容器是否存在 不存在则直接返回
-        if (e.container == null) {
+        if (e.container == null && e.type != 'complex') {
             return;
         }
-        // 进行条件判断 验证一个值是否符合条件 并返回符合条件的值
+        // 验证一个值是否符合条件 并返回符合条件的值
         const reSetValue = (value, min, max, def) => {
             return (value == null || isNaN(value) ? def : (value < min ? min : (value > max ? max : +value)));
         };
@@ -14,32 +14,75 @@ class TSelect {
         const getNewE = () => {
             // 对原有的e进行复制
             e = {...e};
-            // 检查values属性是否存在 不存在则将其设为空数组 存在则检查是否是数组 是数组则进行复制并保证选项值是字符串且唯一
-            e.values = e.values == null ? [] : (Array.isArray(e.values) ? (() => {
-                const values = [];
-                for (let i in e.values) {
-                    if (!values.includes(String(e.values[i]))) {
-                        values.push(String(e.values[i]));
-                    }
-                }
-                return values;
-            })() : 0);
-            // 检查prefix属性是否存在 不存在则将其设为空字符串 存在则需保证是字符串
-            e.prefix = e.prefix == null ? '' : String(e.prefix);
-            // 检查suffix属性是否存在 不存在则将其设为空字符串 存在则需保证是字符串
-            e.suffix = e.suffix == null ? '' : String(e.suffix);
-            // 检查default属性是否存在 并保证其是整数 且不小于0、不大于选项的数量减一 默认值为0
-            e.default = parseInt(reSetValue(e.default, 0, e.values.toString().split(',').length - 1, 0));
-            // 检查number属性是否存在 并保证其是整数 且不小于1、不大于15 默认值为5
-            e.number = parseInt(reSetValue(e.number, 1, 15, 5));
-            // 检查background属性是否存在 不存在则将其设为'#FFFFFF' 存在则需保证是字符串
-            e.background = e.background == null ? '#FFFFFF' : String(e.background);
-            // 检查font属性是否存在 不存在则将其设为空对象 存在则进行复制
+            // 验证type属性 默认值为'simple'
+            e.type = e.type == null ? 'simple' : (() => {
+                return ['simple', 'complex', 'time', 'date'].includes(e.type) ? e.type : 'simple';
+            })();
+            // 验证font属性 默认值为{} 复制内容
             e.font = e.font == null ? {} : {...e.font};
-            // 检查font属性是否存在size属性 并保证其是数值类型 且不小于0.3、不大于1.25 默认值为1
-            e.font.size = reSetValue(e.font.size, 0.3, 1.25, 1);
-            // 检查font属性是否存在color属性 不存在则将其设为'#807F7F' 存在则需保证是字符串
-            e.font.color = e.font.color == null ? '#807F7F' : String(e.font.color);
+            // 根据类型分别验证
+            if (e.type == 'simple') {
+                // 验证values属性 默认值为[] 复制内容 保证其内容为字符串且不重复
+                e.values = e.values == null ? [] : (Array.isArray(e.values) ? (() => {
+                    const values = [];
+                    for (let i in e.values) {
+                        if (!values.includes(String(e.values[i]))) {
+                            values.push(String(e.values[i]));
+                        }
+                    }
+                    return values;
+                })() : []);
+                // 验证prefix属性 默认值为'' 保证其为字符串
+                e.prefix = e.prefix == null ? '' : String(e.prefix);
+                // 验证suffix属性 默认值为'' 保证其为字符串
+                e.suffix = e.suffix == null ? '' : String(e.suffix);
+                // 验证number属性 默认值为5 保证其不小于于1且不大于15
+                e.number = parseInt(reSetValue(e.number, 1, 15, 5));
+                // 验证default属性 默认值为0 保证其不小于0且不大于选项的数量减1
+                e.default = parseInt(reSetValue(e.default, 0, e.values.toString().split(',').length - 1, 0));
+                // 验证background属性 默认值为'#FFFFFF' 保证其是字符串
+                e.background = e.background == null ? '#FFFFFF' : String(e.background);
+                // 验证font属性的size 默认值为1 保证其是数值类型且不小于0.3且不大于1.25
+                e.font.size = reSetValue(e.font.size, 0.3, 1.25, 1);
+                // 验证font属性的color属性 默认值为'#807F7F' 保证其是字符串
+                e.font.color = e.font.color == null ? '#807F7F' : String(e.font.color);
+            } else if (e.type == 'complex') {
+                // 验证values属性 默认值为[] 复制内容 保证其内容为对象
+                e.values = e.values == null ? [] : (Array.isArray(e.values) ? (() => {
+                    const values = {...e.values};
+                    for (let i in e.values) {
+                        e.values != null && typeof e.values[i] == 'object' && !Array.isArray(e.values[i]) ? (() => {
+                            values[i] = {...e.values[i]};
+                            // 验证values属性中元素的container属性
+                            values[i].container == null ? values[i].container = e.container : 0;
+                            // 验证values属性中元素的number属性
+                            values[i].number == null ? values[i].number = e.number : 0;
+                            // 验证values属性中元素的background属性
+                            values[i].background == null ? values[i].background = e.background : 0;
+                            // 验证values属性中元素的font属性
+                            values[i].font = values[i].font == null ? {...e.font} : {...values[i].font};
+                            // 验证values属性中元素的font属性的size属性
+                            values[i].font.size == null ? values[i].font.size = e.font.size : 0;
+                            // 验证values属性中元素的font属性的color属性
+                            values[i].font.color == null ? values[i].font.color = e.font.color : 0;
+                        })() : 0;
+                    }
+                    return values;
+                })() : []);
+                
+            } else if (e.type == 'time') {
+
+            } else {
+
+            }
+            
+            
+            
+            
+
+
+
+
             // 检查opacity属性是否存在 不存在则将其设为空对象
             e.opacity = e.opacity == null ? {} : {...e.opacity};
             // 检查opacity属性是否存在change属性 不存在则将其设为true 存在则需保证其是布尔类型
@@ -68,14 +111,23 @@ class TSelect {
         };
         // 获取一个新的e
         e = getNewE();
+        // TSelect实例
+        const ts = [];
+        if (e.type == 'complex') {
+            for (let i in e.values) {
+                ts.push(new TSelect(e.values[i]));
+            }
+            console.log(ts);
+            return;
+        }
         // TSelect页面的body
         let body;
         // 显示的选项个数
         let number = e.number;
         // 背景颜色
         let background = e.background;
-        // 选择线颜色
-        let lineColor = e.line.color;
+        // 选择线高度 选择线颜色
+        let lineHeight = e.line.height, lineColor = e.line.color;
         // 选项值
         const values = {};
         // 前缀 后缀
@@ -91,11 +143,11 @@ class TSelect {
         // 获取选项部分相关样式
         const getStyle = () => {
             // 选项信息高度
-            msgHeight = (100 - (number - 1) * e.line.height) / number;
+            msgHeight = (100 - (number - 1) * lineHeight) / number;
             // 最大marginTop
-            maxMarginTop = msgHeight * parseInt(number / 2) + e.line.height * (parseInt(number / 2) - 1);
+            maxMarginTop = msgHeight * parseInt(number / 2) + lineHeight * (parseInt(number / 2) - 1);
             // 最小marginTop
-            minMarginTop = maxMarginTop - (this.number - 1) * (e.line.height + msgHeight);
+            minMarginTop = maxMarginTop - (this.number - 1) * (lineHeight + msgHeight);
         };
         // 用于增加选项信息的函数
         let addMsg = () => {};
@@ -134,19 +186,21 @@ class TSelect {
             showNumber: {
                 get: () => number,
                 set(sNumber) {
-                    getStyle(number = parseInt(reSetValue(sNumber, 1, 15, 5)));
-                    for (const i in msg) {
-                        Object.assign(msg[i].style, {
-                            height: msgHeight + 'vh',
-                            fontSize: z.getFontSize(msgHeight / 2 * e.font.size),
-                            lineHeight: msgHeight + 'vh'
-                        });
-                    }
-                    for (const i in line) {
-                        line[i].style.top = maxMarginTop + (msgHeight + e.line.height) * i + 'vh';
-                    }
-                    msgBox.style.marginTop = maxMarginTop - code * (e.line.height + msgHeight) + 'vh';
-                    e.opacity.change ? opacityReSet(code) : 0;
+                    (sNumber = parseInt(reSetValue(sNumber, 1, 15, 5))) != number ? (() => {
+                        getStyle(number = sNumber);
+                        for (const i in msg) {
+                            Object.assign(msg[i].style, {
+                                height: msgHeight + 'vh',
+                                fontSize: z.getFontSize(msgHeight / 2 * e.font.size),
+                                lineHeight: msgHeight + 'vh'
+                            });
+                        }
+                        for (const i in line) {
+                            line[i].style.top = maxMarginTop + (msgHeight + lineHeight) * i + 'vh';
+                        }
+                        msgBox.style.marginTop = maxMarginTop - code * (lineHeight + msgHeight) + 'vh';
+                        e.opacity.change ? opacityReSet(code) : 0;
+                    })() : 0;
                 }
             },
             // 背景颜色
@@ -154,6 +208,31 @@ class TSelect {
                 get: () => background,
                 set(sBackground) {
                     body.style.background = background = sBackground;
+                }
+            },
+            // 选择线高度
+            lineHeight: {
+                get: () => lineHeight,
+                set(sLineHeight) {
+                    (sLineHeight = reSetValue(sLineHeight, 0.5, 1.25, 1)) != lineHeight ? (() => {
+                        getStyle(lineHeight = sLineHeight);
+                        for (let i in line) {
+                            Object.assign(line[i].style, {
+                                top: maxMarginTop + (msgHeight + lineHeight) * i + 'vh',
+                                height: lineHeight + '%'
+                            });
+                        }
+                        for (let i in msg) {
+                            Object.assign(msg[i].style, {
+                                marginTop: lineHeight + 'vh',
+                                height: msgHeight + 'vh',
+                                fontSize: z.getFontSize(msgHeight / 2 * e.font.size),
+                                lineHeight: msgHeight + 'vh'
+                            });
+                            msg[i].style.marginTop = lineHeight + 'vh';
+                        }
+                        msgBox.style.marginTop = maxMarginTop - code * (lineHeight + msgHeight) + 'vh';
+                    })() : 0;
                 }
             },
             // 选择线颜色
@@ -221,7 +300,7 @@ class TSelect {
                 set(sCode) {
                     if (sCode >= 0 && sCode < this.number || sCode == 0) {
                         lastCode = code;
-                        msgBox.style.marginTop = maxMarginTop - (code = sCode) * (e.line.height + msgHeight) + 'vh';
+                        msgBox.style.marginTop = maxMarginTop - (code = sCode) * (lineHeight + msgHeight) + 'vh';
                         direction = lastCode < code ? 1 : (lastCode > code ? -1 : 0);
                         code != moveCode ? audioPlay() : 0;
                         moveCode = code;
@@ -293,7 +372,7 @@ class TSelect {
                             const newMsg = addMsg(code);
                             code < this.number - 1 ? msgBox.insertBefore(newMsg, msg[code]) : msgBox.appendChild(newMsg);
                             msg.splice(code, 0, newMsg);
-                            minMarginTop = maxMarginTop - (this.number - 1) * (e.line.height + msgHeight);
+                            minMarginTop = maxMarginTop - (this.number - 1) * (lineHeight + msgHeight);
                             this.code = this.number == 1 ? 0 : (code <= this.code ? ++this.code : this.code);
                             return true;
                         } else {
@@ -314,7 +393,7 @@ class TSelect {
                         delete values[this.number];
                         msgBox.removeChild(msg[code]);
                         msg.splice(code,1);
-                        minMarginTop = maxMarginTop - (this.number - 1) * (e.line.height + msgHeight);
+                        minMarginTop = maxMarginTop - (this.number - 1) * (lineHeight + msgHeight);
                         this.code = this.isEmpty ? 0 : (this.code == this.number || this.code > code ? --this.code : this.code);
                         return true;
                     } else {
@@ -434,8 +513,6 @@ class TSelect {
             z.setFontSuffix('vh');
             // 获取当前所在位置的选项的编号
             const moveCodeGet = () => {
-                // 用于计算的选择线高度
-                const lineHeight = e.line.height;
                 if (z.strRemove(msgBox.style.marginTop) >= maxMarginTop - (lineHeight + msgHeight / 2)) {
                     return 0;
                 } else if (z.strRemove(msgBox.style.marginTop) <= minMarginTop + msgHeight / 2) {
@@ -457,7 +534,7 @@ class TSelect {
                 min < 0 ? min = 0 : 0;
                 let max = nowMoveCode + needNumber;
                 max > this.number - 1 ? max = this.number - 1 : 0;
-                const moveTimes = +(-(z.strRemove(msgBox.style.marginTop) - (maxMarginTop - nowMoveCode * (e.line.height + msgHeight))) / (e.line.height + msgHeight)).toFixed(2);
+                const moveTimes = +(-(z.strRemove(msgBox.style.marginTop) - (maxMarginTop - nowMoveCode * (lineHeight + msgHeight))) / (lineHeight + msgHeight)).toFixed(2);
                 for (let i = min; i <= max; i++) {
                     msg[i].style.opacity = (e.opacity.max - ((e.opacity.max - e.opacity.min) / Math.floor((number - 1) / 2)) * (Math.abs(i - (nowMoveCode + moveTimes)))).toFixed(2);
                 }
@@ -535,11 +612,11 @@ class TSelect {
                     'style', [
                         'position', 'fixed',
                         'z-index', -1,
-                        'top', maxMarginTop + (msgHeight + e.line.height) * i + 'vh',
+                        'top', maxMarginTop + (msgHeight + lineHeight) * i + 'vh',
                         'left', 0,
                         'margin', '',
                         'width', '100%',
-                        'height', e.line.height + '%',
+                        'height', lineHeight + '%',
                         'background', lineColor
                     ]
                 ], container);
@@ -566,8 +643,6 @@ class TSelect {
             };
             // 选项信息容器重设已经选择选项更新
             const msgBoxReSet = () => {
-                // 用于计算的选择线高度
-                const lineHeight = e.line.height;
                 // 一次移动的距离
                 const marginMove = (lineHeight + msgHeight) / 50;
                 // 需要的选项的编号
@@ -643,7 +718,7 @@ class TSelect {
                     'div',
                     'innerHTML', getFullValue(code),
                     'style',[
-                        'margin-top', e.line.height + 'vh',
+                        'margin-top', lineHeight + 'vh',
                         'width', '100%',
                         'height', msgHeight + 'vh',
                         'color', e.font.color,
@@ -667,7 +742,7 @@ class TSelect {
             for (let i in values) {
                 msgBox.appendChild(msg[i] = addMsg(i));
             }
-            msgBox.style.marginTop = maxMarginTop - code * (e.line.height + msgHeight) + 'vh';
+            msgBox.style.marginTop = maxMarginTop - code * (lineHeight + msgHeight) + 'vh';
             e.opacity.change ? opacityReSet(code) : 0;
         };
         if (navigator.userAgent.toUpperCase().includes('Firefox'.toUpperCase())) {

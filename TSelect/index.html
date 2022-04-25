@@ -17,11 +17,13 @@
     <script src="../zdj.js"></script>
     <script src="TSelect.js"></script>
     <script>
+        /*
         const ts = new TSelect({
             container: document.body,
+            type: 'simple',
             values: (() => {
                 const arr = [];
-                for (let i = 0; i < 30; i++) {
+                for (let i = 0; i < 10; i++) {
                     arr.push(i + 1);
                 }
                 arr.push(5);
@@ -52,17 +54,33 @@
 
             },
             valueChangeFunction: function() {
-                if (this.code < 15) {
+                if (this.code < 5 && this.background != '#EEEEEE') {
                     this.background = '#FFFFFF';
                     this.lineColor = '#EEEEEE';
-                    this.showNumber = 5;
-                } else {
+                } else if (this.code >= 5 && this.background != '#000000') {
                     this.background = '#000000';
                     this.lineColor = '#111111';
-                    this.showNumber = 7;
                 }
                 console.log(6);
             }
+        });
+        */
+    </script>
+    <script>
+        const ts = new TSelect({
+            container: document.body,
+            type: 'complex',
+            values: [{
+                values: [1, 2, 3, 4, 5],
+                number: 3,
+                background: '#000000',
+                font: {
+                    size: 0.8,
+                    color: '#7F7F80'
+                }
+            }, {
+                values: [1, 2, 3, 4]
+            }]
         });
     </script>
 </body>

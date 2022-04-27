@@ -131,7 +131,8 @@ class TSelect {
             // 根据类型分别验证
             if (e.type == 'simple') {
                 // 验证values属性 默认值为[] 复制内容 保证其内容为字符串且不重复
-                e.values = e.values == null ? [] : (Array.isArray(e.values) ? (() => {
+                const defaultValue = ['这是一个没有选项的TSelect实例', '请添加选项!'];
+                e.values = e.values == null ? defaultValue : (Array.isArray(e.values) ? (() => {
                     const values = [];
                     for (let i in e.values) {
                         if (!values.includes(String(e.values[i]))) {
@@ -139,7 +140,7 @@ class TSelect {
                         }
                     }
                     return values;
-                })() : []);
+                })() : defaultValue);
                 // 验证prefix属性 默认值为'' 保证其为字符串
                 e.prefix = e.prefix == null ? '' : String(e.prefix);
                 // 验证suffix属性 默认值为'' 保证其为字符串
@@ -234,15 +235,14 @@ class TSelect {
                 totalWidth != e.width ? (() => {
                     let setWidth = 0;
                     for (const i in width) {
-                        i < width.length - 1 ? setWidth += width[i] = +(width[i] / totalWidth * e.width).toFixed(3) : (() => {
-                            width[i] = +(e.width - setWidth).toFixed(3);
+                        i < width.length - 1 ? setWidth += width[i] = width[i] / totalWidth * e.width : (() => {
+                            width[i] = e.width - setWidth;
                         })();
                     }
                 })() : 0;
                 for (const i in width) {
                     e.values[i].width = width[i];
                 }
-                console.log(width);
             } else {
 
             }
@@ -598,27 +598,31 @@ class TSelect {
                 this.checkValue(e.values[i]) < 0 ? values[this.number] = e.values[i] : 0;
             }
         })() : 0;
+        // 设置容器的样式
+        Object.assign(e.container.style, {
+            whiteSpace: 'nowrap',
+            overflow: 'hidden'
+        });
         // 创建一个zdjJs对象
         const z = new zdjJs;
         // 创建容器
         let container = z.addElementByArray([
             'iframe',
             'style', [
-                'display', 'inline-block',
-                'width', (e.width / 100 * e.container.offsetWidth).toFixed(0) + 'px',
                 'height', '100%',
                 'border', 0
             ]
         ], e.container), iframe = container;
         // 修正width
         const setWidth = () => {
+            iframe.style.width = (e.width / 100 * e.container.offsetWidth).toFixed(0) + 'px';
             const width = [], children = [];
             let setWidth = 0;
             for (let i in e.container.children) {
                 const child = e.container.children[i];
                 if (child.nodeType == 1 && child.nodeName.toLowerCase() != 'script') {
-                    setWidth += +child.offsetWidth.toFixed(0);
-                    width.push(+child.offsetWidth.toFixed(0));
+                    setWidth += Math.round(child.offsetWidth);
+                    width.push(Math.round(child.offsetWidth));
                     children.push(child);
                 }
             }
@@ -630,7 +634,6 @@ class TSelect {
         setWidth();
         // 给窗口绑定大小改变事件
         window.addEventListener('resize', () => {
-            iframe.style.width = (e.width / 100 * e.container.offsetWidth).toFixed(0) + 'px';
             setWidth();
         });
         // 结束事件
@@ -772,7 +775,8 @@ class TSelect {
             container = z.addElementByArray([
                 'main',
                 'style', [
-                    'width', '100%',
+                    'margin', '0 2.5%',
+                    'width', '95%',
                     'height', '100%'
                 ],
                 'function', [

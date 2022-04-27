@@ -46,6 +46,8 @@ class TSelect {
                         e.hour.suffix == null ? e.hour.suffix = '时' : 0;
                         // 验证default属性
                         e.hour.default == null ? e.hour.default = date.getHours() : 0;
+                        // 验证width属性
+                        e.hour.width = reSetValue(e.hour.width, 0, 100, 50);
                         values.push(e.hour);
                     })() : 0;
                     // 验证minute属性
@@ -59,6 +61,8 @@ class TSelect {
                         e.minute.suffix == null ? e.minute.suffix = '分' : 0;
                         // 验证default属性
                         e.minute.default == null ? e.minute.default = date.getMinutes() : 0;
+                        // 验证width属性
+                        e.minute.width = reSetValue(e.minute.width, 0, 100, 50);
                         values.push(e.minute);
                     })() : 0;
                     return values;
@@ -221,7 +225,7 @@ class TSelect {
                 e.width = reSetValue(e.width, 0, 100, 100);
                 const width = [];
                 for (let i in e.values) {
-                    width.push(reSetValue(e.values[i], 0, 100, 100 / e.values.length));
+                    width.push(reSetValue(e.values[i].width, 0, 100, 100 / e.values.length));
                 }
                 let totalWidth = 0;
                 for (const i in width) {
@@ -238,6 +242,7 @@ class TSelect {
                 for (const i in width) {
                     e.values[i].width = width[i];
                 }
+                console.log(width);
             } else {
 
             }
@@ -605,6 +610,7 @@ class TSelect {
                 'border', 0
             ]
         ], e.container), iframe = container;
+        // 修正width
         const setWidth = () => {
             const width = [], children = [];
             let setWidth = 0;
@@ -618,7 +624,7 @@ class TSelect {
             }
             setWidth > e.container.offsetWidth ? width[width.length - 1] = e.container.offsetWidth - (setWidth -= width[width.length - 1]) : 0;
             for (let i in children) {
-                children[i].style.width = width.shift() + 'px';
+                children[i].style.width = width[i] + 'px';
             }
         };
         setWidth();

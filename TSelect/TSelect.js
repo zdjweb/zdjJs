@@ -609,8 +609,9 @@ class TSelect {
         let container = z.addElementByArray([
             'iframe',
             'style', [
+                'vertical-align', 'top',
                 'height', '100%',
-                'border', 0
+                'border', 'none'
             ]
         ], e.container), iframe = container;
         // 修正width

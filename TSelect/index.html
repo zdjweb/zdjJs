@@ -70,16 +70,23 @@
         const ts = new TSelect({
             container: document.body,
             type: 'complex',
+            background: '#000000',
+            font: {
+                size: 0.5,
+                color: '#7F7F80'
+            },
+            line: {
+                color: '#111111'
+            },
             values: [{
-                values: [1, 2, 3, 4, 5],
-                number: 3,
-                background: '#000000',
-                font: {
-                    size: 0.8,
-                    color: '#7F7F80'
-                }
+                type: 'date',
+                year: {
+                    width: 40,
+                    start: 2015
+                },
+                // width: 50
             }, {
-                values: [1, 2, 3, 4]
+                type: 'time'
             }]
         });
     </script>

@@ -3,7 +3,7 @@ class TSelect {
     // 构造函数
     constructor(e) {
         // 检查容器是否存在 不存在则直接返回
-        if (e.container == null && e.type != 'complex') {
+        if (e.container == null) {
             return;
         }
         // 验证一个值是否符合条件 并返回符合条件的值
@@ -20,6 +20,110 @@ class TSelect {
             })();
             // 验证font属性 默认值为{} 复制内容
             e.font = e.font == null ? {} : {...e.font};
+            // 验证opacity属性 默认值为{} 复制内容
+            e.opacity = e.opacity == null ? {} : {...e.opacity};
+            // 验证line属性 默认值为{} 复制内容
+            e.line = e.line == null ? {} : {...e.line};
+            if (e.type == 'time') {
+                Object.defineProperty(this, 'type', {
+                    get: () => 'time'
+                });
+                // 验证values属性 默认值为[] 复制内容 保证其内容为对象
+                e.values = (() => {
+                    const values = [];
+                    e.hour = e.hour == null ? {} : ((e.hour.show == null ? true : e.hour.show) ? {...e.hour} : null);
+                    e.minute = e.minute == null ? {} : ((e.minute.show == null ? true : e.minute.show) ? {...e.minute} : null);
+                    // 用于获取当前时间的Date对象
+                    const date = new Date;
+                    // 验证hour属性
+                    e.hour != null ? (() => {
+                        // 设置选项
+                        e.hour.values = [];
+                        for (let i = 0; i < 24; i++) {
+                            e.hour.values[i] = i < 10 ? '0' + i : i;
+                        }
+                        // 验证suffix属性
+                        e.hour.suffix == null ? e.hour.suffix = '时' : 0;
+                        // 验证default属性
+                        e.hour.default == null ? e.hour.default = date.getHours() : 0;
+                        values.push(e.hour);
+                    })() : 0;
+                    // 验证minute属性
+                    e.minute != null ? (() => {
+                        // 设置选项
+                        e.minute.values = [];
+                        for (let i = 0; i < 60; i++) {
+                            e.minute.values[i] = i < 10 ? '0' + i : i;
+                        }
+                        // 验证suffix属性
+                        e.minute.suffix == null ? e.minute.suffix = '分' : 0;
+                        // 验证default属性
+                        e.minute.default == null ? e.minute.default = date.getMinutes() : 0;
+                        values.push(e.minute);
+                    })() : 0;
+                    return values;
+                })();
+                e.type = 'complex';
+            } else if (e.type == 'date') {
+                Object.defineProperty(this, 'type', {
+                    get: () => 'date'
+                });
+                // 验证values属性 默认值为当前时间生成的TSelect的Date模式 复制内容 保证其内容为对象
+                e.values = (() => {
+                    const values = [];
+                    e.year = e.year == null ? {} : ((e.year.show == null ? true : e.year.show) ? {...e.year} : null);
+                    e.month = e.month == null ? {} : ((e.month.show == null ? true : e.month.show) ? {...e.month} : null);
+                    e.date = e.date == null ? {} : ((e.date.show == null ? true : e.date.show) ? {...e.date} : null);
+                    // 用于获取当前时间的Date对象
+                    const date = new Date;
+                    // 验证year属性
+                    e.year != null ? (() => {
+                        // 验证start属性
+                        e.year.start = e.year.start == null ? date.getFullYear() : reSetValue(e.year.start, 1970, 2100, date.getFullYear());
+                        // 验证end属性
+                        e.year.end == null ? e.year.end = date.getFullYear() : 0;
+                        // 设置选项
+                        e.year.values = [];
+                        for (let i = e.year.start; i <= e.year.end; i++) {
+                            e.year.values.push(i);
+                        }
+                        // 验证suffix属性
+                        e.year.suffix == null ? e.year.suffix = '年' : 0;
+                        // 验证default属性
+                        e.year.default == null ? e.year.default = (e.year.values.includes(date.getFullYear()) ? e.year.values.indexOf(date.getFullYear()) : e.year.values.length - 1) : 0;
+                        e.year.width = reSetValue(e.year.width, 0, 100, 40);
+                        values.push(e.year);
+                    })() : 0;
+                    e.month != null ? (() => {
+                        // 设置选项
+                        e.month.values = [];
+                        for (let i = 1; i <= 12; i++) {
+                            e.month.values.push(i);
+                        }
+                        // 验证suffix属性
+                        e.month.suffix == null ? e.month.suffix = '月' : 0;
+                        // 验证default属性
+                        e.month.default == null ? e.month.default = date.getMonth() : 0;
+                        e.month.width = reSetValue(e.month.width, 0, 100, 30);
+                        values.push(e.month);
+                    })() : 0;
+                    e.date != null ? (() => {
+                        // 设置选项
+                        e.date.values = [];
+                        for (let i = 1; i <= new Date(e.year != null ? e.year.values[e.year.default] : date.getFullYear(), (e.month != null ? e.month.default : date.getMonth()) + 1 , 0).getDate(); i++) {
+                            e.date.values.push(i);
+                        }
+                        // 验证suffix属性
+                        e.date.suffix == null ? e.date.suffix = '日' : 0;
+                        // 验证default属性
+                        e.date.default == null ? e.date.default = date.getDate() - 1 : 0;
+                        e.date.width = reSetValue(e.date.width, 0, 100, 30);
+                        values.push(e.date);
+                    })() : 0;
+                    return values;
+                })();
+                e.type = 'complex';
+            }
             // 根据类型分别验证
             if (e.type == 'simple') {
                 // 验证values属性 默认值为[] 复制内容 保证其内容为字符串且不重复
@@ -38,75 +142,105 @@ class TSelect {
                 e.suffix = e.suffix == null ? '' : String(e.suffix);
                 // 验证number属性 默认值为5 保证其不小于于1且不大于15
                 e.number = parseInt(reSetValue(e.number, 1, 15, 5));
+                // 验证width属性 默认值为100 保证其不小于0且不大于100
+                e.width = reSetValue(e.width, 0, 100, 100);
                 // 验证default属性 默认值为0 保证其不小于0且不大于选项的数量减1
-                e.default = parseInt(reSetValue(e.default, 0, e.values.toString().split(',').length - 1, 0));
+                e.default = parseInt(reSetValue(e.default, 0, e.values.length - 1, 0));
                 // 验证background属性 默认值为'#FFFFFF' 保证其是字符串
                 e.background = e.background == null ? '#FFFFFF' : String(e.background);
                 // 验证font属性的size 默认值为1 保证其是数值类型且不小于0.3且不大于1.25
                 e.font.size = reSetValue(e.font.size, 0.3, 1.25, 1);
                 // 验证font属性的color属性 默认值为'#807F7F' 保证其是字符串
                 e.font.color = e.font.color == null ? '#807F7F' : String(e.font.color);
+                // 验证opacity属性的change属性 默认值为true 保证其是布尔类型
+                e.opacity.change = e.opacity.change == null ? true : !!e.opacity.change;
+                // 验证opacity属性的max属性 默认值为1 保证其是数值类型且不小于0且不大于1
+                e.opacity.max = reSetValue(e.opacity.max, 0, 1, 1);
+                // 验证opacity属性的min属性 默认值为0.2 保证其是数值类型且不小于0且不大于1
+                e.opacity.min = reSetValue(e.opacity.min, 0, 1, 0.2);
+                // 如果opacity属性的min属性大于max属性则互换值
+                e.opacity.min > e.opacity.max ? (() => {
+                    e.opacity.min = e.opacity.max - e.opacity.min;
+                    e.opacity.max -= e.opacity.min;
+                    e.opacity.min += e.opacity.max;
+                })() : 0;
+                // 检查opacity属性的max属性是否不小于0.2
+                e.opacity.max = reSetValue(e.opacity.max, 0.2, 1, 0.1);
+                // 验证line属性的height属性 默认值为1 保证其是数值类型且不小于0.5且不大于1.25
+                e.line.height = reSetValue(e.line.height, 0.5, 1.25, 1);
+                // 验证line属性的color属性 默认值为'#EEEEEE' 保证其是字符串
+                e.line.color = e.line.color == null ? '#EEEEEE' : String(e.line.color);
+                // 验证valueChangeFunction属性 默认值为() => {} 进行复制
+                e.valueChangeFunction = e.valueChangeFunction == null ? () => {} : eval(`(${e.valueChangeFunction})`);
             } else if (e.type == 'complex') {
+                this.type == null ? Object.defineProperty(this, 'type', {
+                    get: () => 'complex'
+                }) : 0;
                 // 验证values属性 默认值为[] 复制内容 保证其内容为对象
                 e.values = e.values == null ? [] : (Array.isArray(e.values) ? (() => {
-                    const values = {...e.values};
+                    const values = [...e.values];
+                    // 验证属性
+                    const checkAttribute = (parent, child, attribute) => {
+                        child[attribute] == null ? child[attribute] = parent[attribute] : 0;
+                    };
                     for (let i in e.values) {
                         e.values != null && typeof e.values[i] == 'object' && !Array.isArray(e.values[i]) ? (() => {
+                            // 复制value
                             values[i] = {...e.values[i]};
-                            // 验证values属性中元素的container属性
-                            values[i].container == null ? values[i].container = e.container : 0;
-                            // 验证values属性中元素的number属性
-                            values[i].number == null ? values[i].number = e.number : 0;
-                            // 验证values属性中元素的background属性
-                            values[i].background == null ? values[i].background = e.background : 0;
-                            // 验证values属性中元素的font属性
-                            values[i].font = values[i].font == null ? {...e.font} : {...values[i].font};
-                            // 验证values属性中元素的font属性的size属性
-                            values[i].font.size == null ? values[i].font.size = e.font.size : 0;
-                            // 验证values属性中元素的font属性的color属性
-                            values[i].font.color == null ? values[i].font.color = e.font.color : 0;
+                            // 设置container属性
+                            values[i].container = e.container;
+                            // 验证number属性
+                            checkAttribute(e, values[i], 'number');
+                            // 验证background属性
+                            checkAttribute(e, values[i], 'background');
+                            // 验证font属性
+                            checkAttribute(e, values[i], 'font');
+                            // 验证font属性的size属性
+                            checkAttribute(e.font, values[i].font, 'size');
+                            // 验证font属性的color属性
+                            checkAttribute(e.font, values[i].font, 'color');
+                            // 验证opacity属性
+                            checkAttribute(e, values[i], 'opacity');
+                            // 验证opacity属性的change属性
+                            checkAttribute(e.opacity, values[i].opacity, 'change');
+                            // 验证opacity属性的max属性
+                            checkAttribute(e.opacity, values[i].opacity, 'max');
+                            // 验证opacity属性的min属性
+                            checkAttribute(e.opacity, values[i].opacity, 'min');
+                            // 验证line属性
+                            checkAttribute(e, values[i], 'line');
+                            // 验证line属性的height属性
+                            checkAttribute(e.line, values[i].line, 'height');
+                            // 验证line属性的color属性
+                            checkAttribute(e.line, values[i].line, 'color');
                         })() : 0;
                     }
                     return values;
                 })() : []);
-                
-            } else if (e.type == 'time') {
-
+                // 验证width属性
+                e.width = reSetValue(e.width, 0, 100, 100);
+                const width = [];
+                for (let i in e.values) {
+                    width.push(reSetValue(e.values[i], 0, 100, 100 / e.values.length));
+                }
+                let totalWidth = 0;
+                for (const i in width) {
+                    totalWidth += width[i];
+                }
+                totalWidth != e.width ? (() => {
+                    let setWidth = 0;
+                    for (const i in width) {
+                        i < width.length - 1 ? setWidth += width[i] = +(width[i] / totalWidth * e.width).toFixed(3) : (() => {
+                            width[i] = +(e.width - setWidth).toFixed(3);
+                        })();
+                    }
+                })() : 0;
+                for (const i in width) {
+                    e.values[i].width = width[i];
+                }
             } else {
 
             }
-            
-            
-            
-            
-
-
-
-
-            // 检查opacity属性是否存在 不存在则将其设为空对象
-            e.opacity = e.opacity == null ? {} : {...e.opacity};
-            // 检查opacity属性是否存在change属性 不存在则将其设为true 存在则需保证其是布尔类型
-            e.opacity.change = e.opacity.change == null ? true : !!e.opacity.change;
-            // 检查opacity属性是否存在max属性 并保证其是数值类型 且不小于0、不大于1 默认值为1
-            e.opacity.max = reSetValue(e.opacity.max, 0, 1, 1);
-            // 检查opacity属性是否存在min属性 并保证其是数值类型 且不小于0、不大于1 默认值为0.2
-            e.opacity.min = reSetValue(e.opacity.min, 0, 1, 0.2);
-            // 如果opacity属性的min属性大于max属性则互换值
-            e.opacity.min > e.opacity.max ? (() => {
-                e.opacity.min = e.opacity.max - e.opacity.min;
-                e.opacity.max -= e.opacity.min;
-                e.opacity.min += e.opacity.max;
-            })() : 0;
-            // 检查opacity属性的max属性是否不小于0.2
-            e.opacity.max = reSetValue(e.opacity.max, 0.2, 1, 0.1);
-            // 检查line属性是否存在 不存在则将其设为空对象
-            e.line = e.line == null ? {} : {...e.line};
-            // 检查line属性是否存在height属性 并保证其是数值类型 且不小于0.5、不大于1.25 默认值为1
-            e.line.height = reSetValue(e.line.height, 0.5, 1.25, 1);
-            // 检查line属性是否存在color属性 不存在则将其设为'#EEEEEE' 存在则需保证是字符串
-            e.line.color = e.line.color == null ? '#EEEEEE' : String(e.line.color);
-            // 检查valueChangeFunction属性是否存在 不存在则将其设为空函数 存在则进行复制
-            e.valueChangeFunction = e.valueChangeFunction == null ? () => {} : eval(`(${e.valueChangeFunction})`);
             return e;
         };
         // 获取一个新的e
@@ -115,9 +249,22 @@ class TSelect {
         const ts = [];
         if (e.type == 'complex') {
             for (let i in e.values) {
-                ts.push(new TSelect(e.values[i]));
+                ts.push(this[ts.length] = new TSelect(e.values[i]));
             }
-            console.log(ts);
+            Object.defineProperties(this, {
+                fullValue: {
+                    get: () => {
+                        let value = '';
+                        for (let i in ts) {
+                            value += ts[i].fullValue;
+                        }
+                        return value;
+                    }
+                },
+                value: {
+                    get: () => this.fullValue
+                }
+            });
             return;
         }
         // TSelect页面的body
@@ -181,6 +328,10 @@ class TSelect {
             // 设置信息
             set: {
                 get: () => getNewE()
+            },
+            // TSelect类型
+            type: {
+                get: () => e.type
             },
             // 显示的选项个数
             showNumber: {
@@ -448,11 +599,34 @@ class TSelect {
         let container = z.addElementByArray([
             'iframe',
             'style', [
-                'width', '100%',
+                'display', 'inline-block',
+                'width', (e.width / 100 * e.container.offsetWidth).toFixed(0) + 'px',
                 'height', '100%',
                 'border', 0
             ]
-        ], e.container);
+        ], e.container), iframe = container;
+        const setWidth = () => {
+            const width = [], children = [];
+            let setWidth = 0;
+            for (let i in e.container.children) {
+                const child = e.container.children[i];
+                if (child.nodeType == 1 && child.nodeName.toLowerCase() != 'script') {
+                    setWidth += +child.offsetWidth.toFixed(0);
+                    width.push(+child.offsetWidth.toFixed(0));
+                    children.push(child);
+                }
+            }
+            setWidth > e.container.offsetWidth ? width[width.length - 1] = e.container.offsetWidth - (setWidth -= width[width.length - 1]) : 0;
+            for (let i in children) {
+                children[i].style.width = width.shift() + 'px';
+            }
+        };
+        setWidth();
+        // 给窗口绑定大小改变事件
+        window.addEventListener('resize', () => {
+            iframe.style.width = (e.width / 100 * e.container.offsetWidth).toFixed(0) + 'px';
+            setWidth();
+        });
         // 结束事件
         let end = () => {};
         // 判断是否移出TSelect范围

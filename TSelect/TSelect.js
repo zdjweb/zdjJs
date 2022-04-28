@@ -1,133 +1,19 @@
-// TSelect类
+
 class TSelect {
-    // 构造函数
+    
     constructor(e) {
-        // 检查容器是否存在 不存在则直接返回
-        if (e.container == null) {
-            return;
-        }
+
         // 验证一个值是否符合条件 并返回符合条件的值
         const reSetValue = (value, min, max, def) => {
             return (value == null || isNaN(value) ? def : (value < min ? min : (value > max ? max : +value)));
         };
-        // 创建一个新的e
         const getNewE = () => {
-            // 对原有的e进行复制
-            e = {...e};
-            // 验证type属性 默认值为'simple'
-            e.type = e.type == null ? 'simple' : (() => {
-                return ['simple', 'complex', 'time', 'date'].includes(e.type) ? e.type : 'simple';
-            })();
-            // 验证font属性 默认值为{} 复制内容
-            e.font = e.font == null ? {} : {...e.font};
-            // 验证opacity属性 默认值为{} 复制内容
-            e.opacity = e.opacity == null ? {} : {...e.opacity};
-            // 验证line属性 默认值为{} 复制内容
-            e.line = e.line == null ? {} : {...e.line};
-            if (e.type == 'date') {
-                Object.defineProperty(this, 'type', {
-                    get: () => 'date'
-                });
-                // 验证values属性 默认值为当前时间生成的TSelect的Date模式 复制内容 保证其内容为对象
-                e.values = (() => {
-                    const values = [];
-                    e.year = e.year == null ? {} : ((e.year.show == null ? true : e.year.show) ? {...e.year} : null);
-                    e.month = e.month == null ? {} : ((e.month.show == null ? true : e.month.show) ? {...e.month} : null);
-                    e.date = e.date == null ? {} : ((e.date.show == null ? true : e.date.show) ? {...e.date} : null);
-                    // 用于获取当前时间的Date对象
-                    const date = new Date;
-                    // 验证year属性
-                    e.year != null ? (() => {
-                        // 验证start属性
-                        e.year.start = e.year.start == null ? date.getFullYear() : reSetValue(e.year.start, 1970, 2100, date.getFullYear());
-                        // 验证end属性
-                        e.year.end == null ? e.year.end = date.getFullYear() : 0;
-                        // 设置选项
-                        e.year.values = [];
-                        for (let i = e.year.start; i <= e.year.end; i++) {
-                            e.year.values.push(i);
-                        }
-                        // 验证suffix属性
-                        e.year.suffix == null ? e.year.suffix = '年' : 0;
-                        // 验证default属性
-                        e.year.default == null ? e.year.default = (e.year.values.includes(date.getFullYear()) ? e.year.values.indexOf(date.getFullYear()) : e.year.values.length - 1) : 0;
-                        // 验证width属性
-                        e.year.width = reSetValue(e.year.width, 0, 100, 40);
-                        // 设置类型
-                        e.year.type = 'year';
-                        // 设置valueChangeFunction
-                        e.year.valueChangeFunction = e.year.valueChangeFunction == null ? function() {
-                            this.day != null ? (() => {
-                                const number = new Date(this.value, this.month == null ? (new Date).getMonth() + 1 : this.month.value, 0).getDate();
-                                this.day.code > number - 1 ? this.day.code = number - 1 : 0;
-                                while (this.day.number > number) {
-                                    this.day.deleteValue();
-                                }
-                                while (this.day.number < number) {
-                                    this.day.addValue(+this.day.values[this.day.number - 1] + 1);
-                                }
-                            })() : 0;
-                        } : eval(`(${e.year.valueChangeFunction})`);
-                        values.push(e.year);
-                    })() : 0;
-                    e.month != null ? (() => {
-                        // 设置选项
-                        e.month.values = [];
-                        for (let i = 1; i <= 12; i++) {
-                            e.month.values.push(i);
-                        }
-                        // 验证suffix属性
-                        e.month.suffix == null ? e.month.suffix = '月' : 0;
-                        // 验证default属性
-                        e.month.default == null ? e.month.default = date.getMonth() : 0;
-                        // 验证width属性
-                        e.month.width = reSetValue(e.month.width, 0, 100, 30);
-                        // 设置类型
-                        e.month.type = 'month';
-                        // 设置valueChangeFunction
-                        e.month.valueChangeFunction = e.month.valueChangeFunction == null ? function() {
-                            this.day != null ? (() => {
-                                const number = new Date(this.year == null ? (new Date).getFullYear() : this.year.value, this.value, 0).getDate();
-                                this.day.code > number - 1 ? this.day.code = number - 1 : 0;
-                                while (this.day.number > number) {
-                                    this.day.deleteValue();
-                                }
-                                while (this.day.number < number) {
-                                    this.day.addValue(+this.day.values[this.day.number - 1] + 1);
-                                }
-                            })() : 0;
-                        } : eval(`(${e.month.valueChangeFunction})`);
-                        values.push(e.month);
-                    })() : 0;
-                    e.date != null ? (() => {
-                        // 设置选项
-                        e.date.values = [];
-                        for (let i = 1; i <= new Date(e.year != null ? e.year.values[e.year.default] : date.getFullYear(), (e.month != null ? e.month.default : date.getMonth()) + 1 , 0).getDate(); i++) {
-                            e.date.values.push(i);
-                        }
-                        // 验证suffix属性
-                        e.date.suffix == null ? e.date.suffix = '日' : 0;
-                        // 验证default属性
-                        e.date.default == null ? e.date.default = date.getDate() - 1 : 0;
-                        e.date.width = reSetValue(e.date.width, 0, 100, 30);
-                        // 设置类型
-                        e.date.type = 'day';
-                        values.push(e.date);
-                    })() : 0;
-                    return values;
-                })();
-                e.type = 'complex';
-            } else if (e.type == 'time') {
-                Object.defineProperty(this, 'type', {
-                    get: () => 'time'
-                });
+            if (e.type == 'time') {
+
                 // 验证values属性 默认值为[] 复制内容 保证其内容为对象
                 e.values = (() => {
-                    const values = [];
-                    e.hour = e.hour == null ? {} : ((e.hour.show == null ? true : e.hour.show) ? {...e.hour} : null);
-                    e.minute = e.minute == null ? {} : ((e.minute.show == null ? true : e.minute.show) ? {...e.minute} : null);
-                    // 用于获取当前时间的Date对象
-                    const date = new Date;
+                    
+
                     // 验证hour属性
                     e.hour != null ? (() => {
                         // 设置选项
@@ -135,12 +21,8 @@ class TSelect {
                         for (let i = 0; i < 24; i++) {
                             e.hour.values[i] = i < 10 ? '0' + i : i;
                         }
-                        // 验证suffix属性
-                        e.hour.suffix == null ? e.hour.suffix = '时' : 0;
                         // 验证default属性
                         e.hour.default == null ? e.hour.default = date.getHours() : 0;
-                        // 验证width属性
-                        e.hour.width = reSetValue(e.hour.width, 0, 100, 50);
                         values.push(e.hour);
                     })() : 0;
                     // 验证minute属性
@@ -158,11 +40,9 @@ class TSelect {
                         e.minute.width = reSetValue(e.minute.width, 0, 100, 50);
                         values.push(e.minute);
                     })() : 0;
-                    return values;
                 })();
-                e.type = 'complex';
+                
             }
-            // 根据类型分别验证
             if (e.type == 'simple') {
                 // 验证values属性 默认值为[] 复制内容 保证其内容为字符串且不重复
                 const defaultValue = ['这是一个没有选项的TSelect实例', '请添加选项!'];
@@ -187,28 +67,14 @@ class TSelect {
                 e.default = parseInt(reSetValue(e.default, 0, e.values.length - 1, 0));
                 // 验证background属性 默认值为'#FFFFFF' 保证其是字符串
                 e.background = e.background == null ? '#FFFFFF' : String(e.background);
-                // 验证font属性的size 默认值为1 保证其是数值类型且不小于0.3且不大于1.25
-                e.font.size = reSetValue(e.font.size, 0.3, 1.25, 1);
-                // 验证font属性的color属性 默认值为'#807F7F' 保证其是字符串
-                e.font.color = e.font.color == null ? '#807F7F' : String(e.font.color);
-                // 验证opacity属性的change属性 默认值为true 保证其是布尔类型
-                e.opacity.change = e.opacity.change == null ? true : !!e.opacity.change;
-                // 验证opacity属性的max属性 默认值为1 保证其是数值类型且不小于0且不大于1
-                e.opacity.max = reSetValue(e.opacity.max, 0, 1, 1);
-                // 验证opacity属性的min属性 默认值为0.2 保证其是数值类型且不小于0且不大于1
-                e.opacity.min = reSetValue(e.opacity.min, 0, 1, 0.2);
-                // 如果opacity属性的min属性大于max属性则互换值
-                e.opacity.min > e.opacity.max ? (() => {
-                    e.opacity.min = e.opacity.max - e.opacity.min;
-                    e.opacity.max -= e.opacity.min;
-                    e.opacity.min += e.opacity.max;
-                })() : 0;
-                // 检查opacity属性的max属性是否不小于0.2
-                e.opacity.max = reSetValue(e.opacity.max, 0.2, 1, 0.1);
-                // 验证line属性的height属性 默认值为1 保证其是数值类型且不小于0.5且不大于1.25
-                e.line.height = reSetValue(e.line.height, 0.5, 1.25, 1);
-                // 验证line属性的color属性 默认值为'#EEEEEE' 保证其是字符串
-                e.line.color = e.line.color == null ? '#EEEEEE' : String(e.line.color);
+                
+
+                
+            
+
+
+
+
                 // 验证valueChangeFunction属性 默认值为() => {} 进行复制
                 e.valueChangeFunction = e.valueChangeFunction == null ? () => {} : eval(`(${e.valueChangeFunction})`);
             } else if (e.type == 'complex') {
@@ -280,10 +146,13 @@ class TSelect {
             } else {
 
             }
-            return e;
         };
-        // 获取一个新的e
-        e = getNewE();
+        
+
+
+
+
+
         // TSelect实例
         if (e.type == 'complex') {
             for (const i in e.values) {
@@ -986,12 +855,5 @@ class TSelect {
             setTSelect();
         }
     }
-    // 版本信息
-    get version() {
-        return '1.0.0';
-    }
-    // 作者信息
-    get author() {
-        return '2002-2003';
-    }
+
 }

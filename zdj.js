@@ -23,14 +23,6 @@ class zdjJs{
             container: null
         };
         Object.defineProperties(this,{
-            //版本信息
-            version: {
-                get: () => '1.0.2'
-            },
-            //作者信息
-            author: {
-                get: () => 'zdj0123'
-            },
             //通过数组生成元素
             addElementByArray: {
                 get: () => {

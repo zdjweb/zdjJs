@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="zdj new.js"></script>
+    <script src="TSelect/TSelect new.js"></script>
+    <script>
+        const ts = new TSelect({
+            container: document.body,
+            type: 'date',
+            font: {
+                color: '#7F7F80'
+            },
+            opacity: {
+                change: true,
+                max: 0.2,
+                min: 1
+            },
+            year: {
+                start: 2015,
+                show: false
+            }
+        });
+    </script>
+</body>
+</html>

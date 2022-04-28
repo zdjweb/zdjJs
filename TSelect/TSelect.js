@@ -24,7 +24,100 @@ class TSelect {
             e.opacity = e.opacity == null ? {} : {...e.opacity};
             // 验证line属性 默认值为{} 复制内容
             e.line = e.line == null ? {} : {...e.line};
-            if (e.type == 'time') {
+            if (e.type == 'date') {
+                Object.defineProperty(this, 'type', {
+                    get: () => 'date'
+                });
+                // 验证values属性 默认值为当前时间生成的TSelect的Date模式 复制内容 保证其内容为对象
+                e.values = (() => {
+                    const values = [];
+                    e.year = e.year == null ? {} : ((e.year.show == null ? true : e.year.show) ? {...e.year} : null);
+                    e.month = e.month == null ? {} : ((e.month.show == null ? true : e.month.show) ? {...e.month} : null);
+                    e.date = e.date == null ? {} : ((e.date.show == null ? true : e.date.show) ? {...e.date} : null);
+                    // 用于获取当前时间的Date对象
+                    const date = new Date;
+                    // 验证year属性
+                    e.year != null ? (() => {
+                        // 验证start属性
+                        e.year.start = e.year.start == null ? date.getFullYear() : reSetValue(e.year.start, 1970, 2100, date.getFullYear());
+                        // 验证end属性
+                        e.year.end == null ? e.year.end = date.getFullYear() : 0;
+                        // 设置选项
+                        e.year.values = [];
+                        for (let i = e.year.start; i <= e.year.end; i++) {
+                            e.year.values.push(i);
+                        }
+                        // 验证suffix属性
+                        e.year.suffix == null ? e.year.suffix = '年' : 0;
+                        // 验证default属性
+                        e.year.default == null ? e.year.default = (e.year.values.includes(date.getFullYear()) ? e.year.values.indexOf(date.getFullYear()) : e.year.values.length - 1) : 0;
+                        // 验证width属性
+                        e.year.width = reSetValue(e.year.width, 0, 100, 40);
+                        // 设置类型
+                        e.year.type = 'year';
+                        // 设置valueChangeFunction
+                        e.year.valueChangeFunction = e.year.valueChangeFunction == null ? function() {
+                            this.day != null ? (() => {
+                                const number = new Date(this.value, this.month == null ? (new Date).getMonth() + 1 : this.month.value, 0).getDate();
+                                this.day.code > number - 1 ? this.day.code = number - 1 : 0;
+                                while (this.day.number > number) {
+                                    this.day.deleteValue();
+                                }
+                                while (this.day.number < number) {
+                                    this.day.addValue(+this.day.values[this.day.number - 1] + 1);
+                                }
+                            })() : 0;
+                        } : eval(`(${e.year.valueChangeFunction})`);
+                        values.push(e.year);
+                    })() : 0;
+                    e.month != null ? (() => {
+                        // 设置选项
+                        e.month.values = [];
+                        for (let i = 1; i <= 12; i++) {
+                            e.month.values.push(i);
+                        }
+                        // 验证suffix属性
+                        e.month.suffix == null ? e.month.suffix = '月' : 0;
+                        // 验证default属性
+                        e.month.default == null ? e.month.default = date.getMonth() : 0;
+                        // 验证width属性
+                        e.month.width = reSetValue(e.month.width, 0, 100, 30);
+                        // 设置类型
+                        e.month.type = 'month';
+                        // 设置valueChangeFunction
+                        e.month.valueChangeFunction = e.month.valueChangeFunction == null ? function() {
+                            this.day != null ? (() => {
+                                const number = new Date(this.year == null ? (new Date).getFullYear() : this.year.value, this.value, 0).getDate();
+                                this.day.code > number - 1 ? this.day.code = number - 1 : 0;
+                                while (this.day.number > number) {
+                                    this.day.deleteValue();
+                                }
+                                while (this.day.number < number) {
+                                    this.day.addValue(+this.day.values[this.day.number - 1] + 1);
+                                }
+                            })() : 0;
+                        } : eval(`(${e.month.valueChangeFunction})`);
+                        values.push(e.month);
+                    })() : 0;
+                    e.date != null ? (() => {
+                        // 设置选项
+                        e.date.values = [];
+                        for (let i = 1; i <= new Date(e.year != null ? e.year.values[e.year.default] : date.getFullYear(), (e.month != null ? e.month.default : date.getMonth()) + 1 , 0).getDate(); i++) {
+                            e.date.values.push(i);
+                        }
+                        // 验证suffix属性
+                        e.date.suffix == null ? e.date.suffix = '日' : 0;
+                        // 验证default属性
+                        e.date.default == null ? e.date.default = date.getDate() - 1 : 0;
+                        e.date.width = reSetValue(e.date.width, 0, 100, 30);
+                        // 设置类型
+                        e.date.type = 'day';
+                        values.push(e.date);
+                    })() : 0;
+                    return values;
+                })();
+                e.type = 'complex';
+            } else if (e.type == 'time') {
                 Object.defineProperty(this, 'type', {
                     get: () => 'time'
                 });
@@ -64,65 +157,6 @@ class TSelect {
                         // 验证width属性
                         e.minute.width = reSetValue(e.minute.width, 0, 100, 50);
                         values.push(e.minute);
-                    })() : 0;
-                    return values;
-                })();
-                e.type = 'complex';
-            } else if (e.type == 'date') {
-                Object.defineProperty(this, 'type', {
-                    get: () => 'date'
-                });
-                // 验证values属性 默认值为当前时间生成的TSelect的Date模式 复制内容 保证其内容为对象
-                e.values = (() => {
-                    const values = [];
-                    e.year = e.year == null ? {} : ((e.year.show == null ? true : e.year.show) ? {...e.year} : null);
-                    e.month = e.month == null ? {} : ((e.month.show == null ? true : e.month.show) ? {...e.month} : null);
-                    e.date = e.date == null ? {} : ((e.date.show == null ? true : e.date.show) ? {...e.date} : null);
-                    // 用于获取当前时间的Date对象
-                    const date = new Date;
-                    // 验证year属性
-                    e.year != null ? (() => {
-                        // 验证start属性
-                        e.year.start = e.year.start == null ? date.getFullYear() : reSetValue(e.year.start, 1970, 2100, date.getFullYear());
-                        // 验证end属性
-                        e.year.end == null ? e.year.end = date.getFullYear() : 0;
-                        // 设置选项
-                        e.year.values = [];
-                        for (let i = e.year.start; i <= e.year.end; i++) {
-                            e.year.values.push(i);
-                        }
-                        // 验证suffix属性
-                        e.year.suffix == null ? e.year.suffix = '年' : 0;
-                        // 验证default属性
-                        e.year.default == null ? e.year.default = (e.year.values.includes(date.getFullYear()) ? e.year.values.indexOf(date.getFullYear()) : e.year.values.length - 1) : 0;
-                        e.year.width = reSetValue(e.year.width, 0, 100, 40);
-                        values.push(e.year);
-                    })() : 0;
-                    e.month != null ? (() => {
-                        // 设置选项
-                        e.month.values = [];
-                        for (let i = 1; i <= 12; i++) {
-                            e.month.values.push(i);
-                        }
-                        // 验证suffix属性
-                        e.month.suffix == null ? e.month.suffix = '月' : 0;
-                        // 验证default属性
-                        e.month.default == null ? e.month.default = date.getMonth() : 0;
-                        e.month.width = reSetValue(e.month.width, 0, 100, 30);
-                        values.push(e.month);
-                    })() : 0;
-                    e.date != null ? (() => {
-                        // 设置选项
-                        e.date.values = [];
-                        for (let i = 1; i <= new Date(e.year != null ? e.year.values[e.year.default] : date.getFullYear(), (e.month != null ? e.month.default : date.getMonth()) + 1 , 0).getDate(); i++) {
-                            e.date.values.push(i);
-                        }
-                        // 验证suffix属性
-                        e.date.suffix == null ? e.date.suffix = '日' : 0;
-                        // 验证default属性
-                        e.date.default == null ? e.date.default = date.getDate() - 1 : 0;
-                        e.date.width = reSetValue(e.date.width, 0, 100, 30);
-                        values.push(e.date);
                     })() : 0;
                     return values;
                 })();
@@ -251,10 +285,24 @@ class TSelect {
         // 获取一个新的e
         e = getNewE();
         // TSelect实例
-        const ts = [];
         if (e.type == 'complex') {
-            for (let i in e.values) {
-                ts.push(this[ts.length] = new TSelect(e.values[i]));
+            for (const i in e.values) {
+                const newTSelect = new TSelect(e.values[i]);
+                Object.defineProperty(this, i, {
+                    get: () => newTSelect
+                });
+                if (['date', 'year', 'month', 'day', 'hour', 'minute'].includes(e.values[i].type)) {
+                    Object.defineProperty(this, e.values[i].type, {
+                        get: () => newTSelect
+                    });
+                    for (const j in e.values) {
+                        if (['date', 'year', 'month', 'day', 'hour', 'minute'].includes(e.values[j].type) && e.values[i].type != e.values[j].type) {
+                            Object.defineProperty(this[e.values[i].type], e.values[j].type, {
+                                get: () => this[e.values[j].type]
+                            });
+                        }
+                    }
+                }
             }
             Object.defineProperties(this, {
                 fullValue: {

@@ -28,7 +28,7 @@ class zdjJs {
             let def = sObj.default;
             if (def == null) {
                 if (sObj.values == null) {
-                    return false;
+                    return null;
                 }
                 def = sObj.values[0];
             }
@@ -50,7 +50,7 @@ class zdjJs {
                 const value = sObj.value != null ? sObj.value : {};
                 for (const i in def) {
                     def[i].value == null ? def[i].value = value[i] : 0;
-                    value[i] = checkValue(def[i]);
+                    value[i] = (def[i].value == null || def[i].value != null && def[i].value.nodeType == null) ? checkValue(def[i]) : def[i].value;
                 }
                 return {...value};
             } else if (type == 'array') {
@@ -58,7 +58,7 @@ class zdjJs {
             } else if (type == 'function') {
                 return eval(`(${ sObj.value != null ? sObj.value : def })`);
             }
-            return false;
+            return null;
         }
         Object.defineProperties(this, {
             // 版本信息

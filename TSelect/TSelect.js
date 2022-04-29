@@ -2,102 +2,23 @@
 class TSelect {
     
     constructor(e) {
-
-        // 验证一个值是否符合条件 并返回符合条件的值
-        const reSetValue = (value, min, max, def) => {
-            return (value == null || isNaN(value) ? def : (value < min ? min : (value > max ? max : +value)));
-        };
+        
         const getNewE = () => {
-            if (e.type == 'time') {
-
-                // 验证values属性 默认值为[] 复制内容 保证其内容为对象
-                e.values = (() => {
-                    
-
-                    // 验证hour属性
-                    e.hour != null ? (() => {
-                        // 设置选项
-                        e.hour.values = [];
-                        for (let i = 0; i < 24; i++) {
-                            e.hour.values[i] = i < 10 ? '0' + i : i;
-                        }
-                        // 验证default属性
-                        e.hour.default == null ? e.hour.default = date.getHours() : 0;
-                        values.push(e.hour);
-                    })() : 0;
-                    // 验证minute属性
-                    e.minute != null ? (() => {
-                        // 设置选项
-                        e.minute.values = [];
-                        for (let i = 0; i < 60; i++) {
-                            e.minute.values[i] = i < 10 ? '0' + i : i;
-                        }
-                        // 验证suffix属性
-                        e.minute.suffix == null ? e.minute.suffix = '分' : 0;
-                        // 验证default属性
-                        e.minute.default == null ? e.minute.default = date.getMinutes() : 0;
-                        // 验证width属性
-                        e.minute.width = reSetValue(e.minute.width, 0, 100, 50);
-                        values.push(e.minute);
-                    })() : 0;
-                })();
-                
-            }
-            if (e.type == 'simple') {
-                // 验证values属性 默认值为[] 复制内容 保证其内容为字符串且不重复
-                const defaultValue = ['这是一个没有选项的TSelect实例', '请添加选项!'];
-                e.values = e.values == null ? defaultValue : (Array.isArray(e.values) ? (() => {
-                    const values = [];
-                    for (let i in e.values) {
-                        if (!values.includes(String(e.values[i]))) {
-                            values.push(String(e.values[i]));
-                        }
-                    }
-                    return values;
-                })() : defaultValue);
-                // 验证prefix属性 默认值为'' 保证其为字符串
-                e.prefix = e.prefix == null ? '' : String(e.prefix);
-                // 验证suffix属性 默认值为'' 保证其为字符串
-                e.suffix = e.suffix == null ? '' : String(e.suffix);
-                // 验证number属性 默认值为5 保证其不小于于1且不大于15
-                e.number = parseInt(reSetValue(e.number, 1, 15, 5));
-                // 验证width属性 默认值为100 保证其不小于0且不大于100
-                e.width = reSetValue(e.width, 0, 100, 100);
-                // 验证default属性 默认值为0 保证其不小于0且不大于选项的数量减1
-                e.default = parseInt(reSetValue(e.default, 0, e.values.length - 1, 0));
-                // 验证background属性 默认值为'#FFFFFF' 保证其是字符串
-                e.background = e.background == null ? '#FFFFFF' : String(e.background);
-                
-
-                
             
+            if (e.type == 'complex') {
 
-
-
-
-                // 验证valueChangeFunction属性 默认值为() => {} 进行复制
-                e.valueChangeFunction = e.valueChangeFunction == null ? () => {} : eval(`(${e.valueChangeFunction})`);
-            } else if (e.type == 'complex') {
-                this.type == null ? Object.defineProperty(this, 'type', {
-                    get: () => 'complex'
-                }) : 0;
                 // 验证values属性 默认值为[] 复制内容 保证其内容为对象
                 e.values = e.values == null ? [] : (Array.isArray(e.values) ? (() => {
-                    const values = [...e.values];
+                    
                     // 验证属性
                     const checkAttribute = (parent, child, attribute) => {
                         child[attribute] == null ? child[attribute] = parent[attribute] : 0;
                     };
                     for (let i in e.values) {
                         e.values != null && typeof e.values[i] == 'object' && !Array.isArray(e.values[i]) ? (() => {
-                            // 复制value
-                            values[i] = {...e.values[i]};
-                            // 设置container属性
-                            values[i].container = e.container;
-                            // 验证number属性
-                            checkAttribute(e, values[i], 'number');
-                            // 验证background属性
-                            checkAttribute(e, values[i], 'background');
+                            
+                            
+                            
                             // 验证font属性
                             checkAttribute(e, values[i], 'font');
                             // 验证font属性的size属性
@@ -143,52 +64,11 @@ class TSelect {
                 for (const i in width) {
                     e.values[i].width = width[i];
                 }
-            } else {
-
             }
         };
         
 
 
-
-
-
-        // TSelect实例
-        if (e.type == 'complex') {
-            for (const i in e.values) {
-                const newTSelect = new TSelect(e.values[i]);
-                Object.defineProperty(this, i, {
-                    get: () => newTSelect
-                });
-                if (['date', 'year', 'month', 'day', 'hour', 'minute'].includes(e.values[i].type)) {
-                    Object.defineProperty(this, e.values[i].type, {
-                        get: () => newTSelect
-                    });
-                    for (const j in e.values) {
-                        if (['date', 'year', 'month', 'day', 'hour', 'minute'].includes(e.values[j].type) && e.values[i].type != e.values[j].type) {
-                            Object.defineProperty(this[e.values[i].type], e.values[j].type, {
-                                get: () => this[e.values[j].type]
-                            });
-                        }
-                    }
-                }
-            }
-            Object.defineProperties(this, {
-                fullValue: {
-                    get: () => {
-                        let value = '';
-                        for (let i in ts) {
-                            value += ts[i].fullValue;
-                        }
-                        return value;
-                    }
-                },
-                value: {
-                    get: () => this.fullValue
-                }
-            });
-            return;
-        }
         // TSelect页面的body
         let body;
         // 显示的选项个数

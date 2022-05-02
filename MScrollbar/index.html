@@ -32,39 +32,31 @@
             height: 1.5vw;
         }
     </style>
-    
     <main>其实我是来撑开页面的</main>
-    <script src="../zdj.js"></script>
+    <script src="../zdj new.js"></script>
     <div id="MScrollbar1"></div>
     <div id="MScrollbar2"></div>
     <script src="MScrollbar.js"></script>
     <script>
-        let ms1 = new MScrollbar({
+        const ms1 = new MScrollbar({
             controlled: window,
             container: document.querySelector('#MScrollbar1'),
-            direction: 0,
-            track: {
-                background: '#C8C8FA'
-            },
             thumb: {
                 width: 70,
                 background: '#FFFFFF',
                 rounded: 80
             }
         });
-        let ms2 = new MScrollbar({
+        const ms2 = new MScrollbar({
             controlled: window,
             container: document.querySelector('#MScrollbar2'),
-            direction: 1,
-            track: {
-                background: '#C8C8FA'
-            },
-            thumb: {
-                width: 70,
-                background: '#FFFFFF',
-                rounded: 80
-            }
+            direction: 1
         });
+        /*
+            优化了设置信息的读取
+            提供了设置信息的获取
+            优化了键盘事件的判断
+        */
     </script>
 </body>
 </html>

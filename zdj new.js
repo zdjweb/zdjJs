@@ -2,7 +2,7 @@
 class zdjJs {
     constructor() {
         // 通过对象生成元素
-        const addElementByOBj = (sObj) => {
+        const addElementByObj = (sObj) => {
             if (sObj.type == null) {
                 return;
             }
@@ -16,7 +16,7 @@ class zdjJs {
                     for (const j in sObj[i]) {
                         element.addEventListener(j, sObj[i][j]);
                     }
-                } else {
+                } else if (i != 'container' && i != 'type') {
                     element.setAttribute(i, sObj[i]);
                 }
             }
@@ -57,9 +57,10 @@ class zdjJs {
         // 验证一个值是否在范围内 返回符合条件的值
         const checkValue = (sObj) => {
             const def = sObj.default != null ? sObj.default : (sObj.values != null ? sObj.values[0] : sObj.value),
-            typeArr = ['Int', 'Float', 'Infinity', 'NaN', 'String', 'Boolean', 'Object', 'Array', 'Element', 'Null', 'Undefined', 'Function', 'Symbol'],
-            type = typeArr.includes(sObj.type) ? sObj.type : this.getType(def);
+            typeArr = ['Int', 'Float', 'Infinity', 'NaN', 'String', 'Boolean', 'Object', 'Array', 'Element', 'Null', 'Undefined', 'Function', 'Symbol'];
+            let type = typeArr.includes(sObj.type) ? sObj.type : this.getType(def);
             if (['Int', 'Float'].includes(type)) {
+                sObj.type != 'Int' ? type = 'Float' : 0;
                 let value = +(sObj.value != null ? sObj.value : def),
                 min = sObj.min != null ? +sObj.min : value,
                 max = sObj.max != null ? +sObj.max : value;
@@ -71,51 +72,50 @@ class zdjJs {
                 ['Infinity', 'NaN'].includes(this.getType(value)) ? value = 0 : 0;
                 ['Infinity', 'NaN'].includes(this.getType(min)) ? min = 0 : 0;
                 ['Infinity', 'NaN'].includes(this.getType(max)) ? max = 0 : 0;
-                console.log(value);
                 return value < min ? min : (value > max ? max : value);
             } else if (type == 'NaN') {
                 return NaN;
             } else if (type == 'Infinity') {
-                const value = sObj.value == null ? sObj.value : def;
+                const value = sObj.value != null ? sObj.value : def;
                 return this.getType(value) == 'Infinity' ? value : Infinity;
             } else if (type == 'String') {
-                const value = String(sObj.value == null ? sObj.value : def),
+                const value = String(sObj.value != null ? sObj.value : def),
                 values = [value];
                 sObj.values != null ? (() => {
                     for (const i in sObj.values) {
                         values.push(String(sObj.values[i]));
                     }
                 })() : 0;
-                return values == null ? value : String(values.includes(value) ? value : def);
+                return values == null ? value : (String(values.includes(value) ? value : def));
             } else if (type == 'Boolean') {
                 return !!(sObj.value != null ? sObj.value : def);
             } else if (type == 'Object') {
-                let value = sObj.value != null ? sObj.value : def;
+                let value = sObj.value != null ? sObj.value : {};
                 this.getType(value) != 'Object' ? value = {} : 0;
                 let obj = this.getType(def) == 'Object' ? def : {};
                 for (const i in obj) {
-                    this.getType(obj[i]) != 'Object' ? obj[i] = {value: obj[i]} : 0;
+                    this.getType(obj[i]) != 'Object' ? obj[i] = {default: obj[i]} : 0;
                     obj[i].value == null ? obj[i].value = value[i] : 0;
                     value[i] = checkValue(obj[i]);
                 }
                 return {...value};
-            } else if (type == 'Null') {
-                return null;
-            } else if (type == 'Undefined') {
-                return undefined;
             } else if (type == 'Array') {
                 let value = sObj.value != null ? sObj.value : def;
                 this.getType(value) != 'Array' ? value = [] : 0;
                 return [...value];
             } else if (type == 'Element') {
-                return sObj.value == null ? sObj.value : def;
+                return sObj.value != null ? sObj.value : def;
+            } else if (type == 'Null') {
+                return null;
+            } else if (type == 'Undefined') {
+                return undefined;
             } else if (type == 'Function') {
                 let value = sObj.value != null ? sObj.value : def;
                 this.getType(value) != 'Function' ? value = () => {} : 0;
                 return eval(`(${ value })`);
             }
             return null;
-        }
+        };
         Object.defineProperties(this, {
             // 版本信息
             version: {
@@ -126,8 +126,8 @@ class zdjJs {
                 get: () => 'zdj0123'
             },
             // 通过对象生成元素
-            addElementByOBj: {
-                get: () => addElementByOBj
+            addElementByObj: {
+                get: () => addElementByObj
             },
             // 格式化字符串为首字母大写、其余小写
             formatStr: {

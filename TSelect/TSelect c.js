@@ -80,16 +80,15 @@ class TSelect {
                     e.year = z.checkValue({
                         value: e.year,
                         default: {
-                            type: {
-                                value: 'year',
-                                default: ''
-                            },
+                            type: 'year',
                             start: {
+                                type: 'Int',
                                 min: 1970,
                                 max: 2100,
                                 default: date.getFullYear()
                             },
                             end: {
+                                type: 'Int',
                                 min: 1970,
                                 max: 2100,
                                 default: date.getFullYear()
@@ -144,7 +143,6 @@ class TSelect {
                         default: {
                             type: {
                                 value: 'month',
-                                default: ''
                             },
                             suffix: {
                                 default: '月'

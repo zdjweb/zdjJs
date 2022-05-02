@@ -28,13 +28,31 @@
             }
         });
         */
-        const z = new zdjJs;
-        console.log(z.checkValue({
-            type: 'Object',
+        const z = new zdjJs,
+        obj = z.checkValue({
             value: {
-                a:  652
+                name: 'Hello',
+                age: 19.5,
+                height: 18.5,
+                parents: {
+                    father: 'zdj',
+                    mother: 'wzy'
+                }
             },
-        }));
+            default: {
+                parents: {
+                    default: {
+                        father: 'Hi',
+                        mother: 'Hola',
+                        default: {
+                            default: 555,
+                            max: 555
+                        }
+                    }
+                }
+            }
+        });
+        console.log(obj);
     </script>
 </body>
 </html>

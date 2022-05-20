@@ -1,8 +1,6 @@
 //VPicture类
 class VPicture{
     constructor(e){
-        //背景颜色
-        let background;
         //用于获取信息的图片
         let setPicture;
         //用于显示的图片
@@ -24,28 +22,13 @@ class VPicture{
         //用户设置的点击事件
         let clickFunction = () => {};
         Object.defineProperties(this,{
-            //版本信息
-            version: {
-                get: () => '1.0.0'
-            },
-            //作者信息
-            author: {
-                get: () => 'zdj0123'
-            },
-            //背景颜色
-            background: {
-                get: () => background,
-                set: (uIn) => {
-                    container.style.background = background = uIn;
-                }
-            },
             //图片地址
             src: {
                 get: () => picture.src,
                 set: (uIn) => {
-                    container.removeChild(picture);
+                    
                     picture = null;
-                    setPicture.src = uIn;
+                    
                 }
             },
             //图片信息
@@ -69,21 +52,8 @@ class VPicture{
                 }
             }
         });
-        //创建zdjJs对象
-        let z = new zdjJs();
-        //创建容器
-        let container = z.addElementByArray([
-            'iframe',
-            'style',[
-                'width','100%',
-                'height','100%',
-                'border',0
-            ]
-        ],e.container);
-        //获取窗口
-        let w = container.contentWindow;
-        //更新容器
-        container = w;
+        
+        
         //显示图片样式重设
         let pictureCssReSet;
         //设置VPicture主要部分
@@ -91,7 +61,7 @@ class VPicture{
             //更新容器
             container = container.document.body;
             //设置容器样式
-            Object.assign(container.style,{
+            Object.assign(container.style, {
                 margin: 0,
                 padding: 0,
                 width: '100vw',
@@ -102,23 +72,25 @@ class VPicture{
                 userSelect: 'none'
             });
             //更新容器
-            container = z.addElementByArray([
-                'div',
-                'style',[
-                    'width','100%',
-                    'height','100%'
-                ]
-            ],container);
+            container = z.addElementByObj({
+                type: 'div',
+                container,
+                style: {
+                    width: '100%',
+                    height: '100%'
+                }
+            });
             //用于显示的图片
             let addPicture = () => {
-                picture = z.addElementByArray([
-                    'img',
-                    'function',[
-                        'mousedown',(event) => {
-                            event.preventDefault();
+                picture = z.addElementByObj({
+                    type: 'img',
+                    container,
+                    function: {
+                        mousedown: (e) => {
+                            e.preventDefault();
                         }
-                    ]
-                ],container);
+                    }
+                });
             }
             //刚刚的容器宽
             let cWidth = container.offsetWidth;
@@ -207,16 +179,17 @@ class VPicture{
                 lastTimes = times;
             }
             //用于获取信息的图片
-            setPicture = z.addElementByArray([
-                'img',
-                'src',e.src?e.src:'',
-                'style',[
-                    'position','fixed',
-                    'top','100vh',
-                    'left','100vw'
-                ],
-                'function',[
-                    'load',() => {
+            setPicture = z.addElementByObj({
+                type: 'img',
+                container,
+                src: e.src? e.src : '',
+                style: {
+                    position: 'fixed',
+                    top: '100vh',
+                    left: '100vw'
+                },
+                function: {
+                    load: () => {
                         times = 1;
                         lastTimes = 1;
                         timesTimes = 0;
@@ -226,8 +199,8 @@ class VPicture{
                         picture.src = setPicture.src;
                         pictureCssReSet(1);
                     }
-                ]
-            ],container);
+                }
+            });
             //当前的x坐标
             let x;
             //当前的y坐标
@@ -323,18 +296,13 @@ class VPicture{
                 mouseEvent(event.detail);
             });
             //移出事件
-            let outFunction = (event) => {
-                if(!event.touches){
-                    if(event.clientX <= 0 || event.clientX >= w.innerWidth || event.clientY <= 0 || event.clientY >= w.innerHeight){
-                        end();
-                    }
-                }else{
-                    if(event.touches[0].clientX <= 0 ||event.touches[0].clientX >= w.innerWidth || event.touches[0].clientY <= 0 || event.touches[0].clientY >= w.innerHeight){
-                        end();
-                    }
-                }
+            const outFunction = (e) => {
+                z.isOut({
+                    e,
+                    function: end
+                });
             }
-            w.addEventListener('mouseout',outFunction);
+            w.addEventListener('mouseout', outFunction);
         };
         if(navigator.userAgent.toUpperCase().includes('Firefox'.toUpperCase())){
             container.addEventListener('load',function(){
@@ -351,11 +319,11 @@ class VPicture{
             b.onreadystatechange = () => {
                 if(b.readyState == 4){
                     if(b.status == 200){
-                        z.addElementByArray([
-                            'a',
-                            'href',URL.createObjectURL(b.response),
-                            'download','图片' + this.picture.src
-                        ]).click();
+                        z.addElementByArray({
+                            type: 'a',
+                            href: URL.createObjectURL(b.response),
+                            download: '图片' + this.picture.src
+                        }).click();
                     }else{
                     }
                 }

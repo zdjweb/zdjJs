@@ -22,55 +22,7 @@ class zdjJs{
             //用于放置页面的容器
             container: null
         };
-        Object.defineProperties(this,{
-            //通过数组生成元素
-            addElementByArray: {
-                get: () => {
-                    return (uArr,uContainer) => {
-                        let element = document.createElement(uArr[0]);
-                        for(let i = 1;i < uArr.length;i += 2){
-                            if(uArr[i] == 'innerHTML'){
-                                element.innerHTML = uArr[i + 1];
-                            }else if(uArr[i] == 'style'){
-                                for(let j = 0;j < uArr[i + 1].length;j += 2){
-                                    element.style.cssText += (uArr[i + 1][j] + ':' + uArr[i + 1][j + 1] + ';'); 
-                                }
-                            }else if(uArr[i] == 'function'){
-                                for(let j = 0;j < uArr[i + 1].length;j += 2){
-                                    element.addEventListener(uArr[i + 1][j],uArr[i + 1][j + 1]);
-                                }
-                            }else{
-                                element.setAttribute(uArr[i],uArr[i + 1]);
-                            }
-                        }
-                        uContainer != undefined?uContainer.appendChild(element):0;
-                        return element;
-                    }
-                }
-            },
-            //动态加载JavaScript文件
-            loadScript: {
-                get: () => {
-                    return (uPath,uContainer) => {
-                        this.addElementByArray([
-                            'script',
-                            'src',uPath
-                        ],uContainer == undefined?document.body:uContainer);
-                    }
-                }
-            },
-            //移除字符串的单位并返回数字类型
-            strRemove: {
-                get: () => {
-                    return (uStr) => {
-                        let arr = ['cm','mm','vmax','vmin','in','px','pt','pc','rem','em','ex','ch','vw','vh','%'];
-                        for(let i in arr){
-                            uStr.includes(arr[i])?uStr = uStr.replace(arr[i],''):0;
-                        }
-                        return Number(uStr);
-                    }
-                }
-            },
+        Object.defineProperties(this, {
             //系统设置导致字体放大的倍数
             fontTimes: {
                 get: () => fontTimes
@@ -113,44 +65,6 @@ class zdjJs{
                 get: () => {
                     return (uSet,uFontTimes,uFontSuffix) => {
                         return (uSet / (uFontTimes == undefined?fontTimes:uFontTimes)).toFixed(2) + (uFontSuffix != undefined?uFontSuffix:fontSuffix);
-                    }
-                }
-            },
-            //获取格式化的时间信息
-            getTime: {
-                get: () => {
-                    return (uStr,uTime,uType) => {
-                        uStr?0:uStr = 'Y/M/D h:m:s';
-                        let state = 0;
-                        let arr = ['Y','M','D','h','m','s'];
-                        let date = uTime != undefined?new Date(uType?uTime * 1000:uTime):new Date();
-                        let str = '';
-                        for(let i in uStr){
-                            if(state == 0){
-                                if(uStr[i] == '!'){
-                                    state = 1;
-                                }else{
-                                    if(arr.includes(uStr[i])){
-                                        let text = date[[
-                                            'getFullYear',
-                                            'getMonth',
-                                            'getDate',
-                                            'getHours',
-                                            'getMinutes',
-                                            'getSeconds'
-                                        ][arr.indexOf(uStr[i])]]();
-                                        arr.indexOf(uStr[i]) == 1?text++:0;
-                                        text < 10?str += '0' + text:str += text;
-                                    }else{
-                                        str += uStr[i];
-                                    }
-                                }
-                            }else{
-                                str += uStr[i];
-                                state = 0;
-                            }
-                        }
-                        return str;
                     }
                 }
             },
